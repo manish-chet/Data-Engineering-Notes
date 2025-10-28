@@ -105,12 +105,8 @@ Support for complex data types
 
 In traditional, row-based storage, the data is stored as a sequence of rows. Something like this:
 
-![Steps](parquet.svg)
+![Steps](parquetnew.svg)
 
-Let’s now examine how the column store works. As you may assume, the approach is 180 degrees different:
-
-
-![Steps](par.svg)
 
 Parquet is a columnar format that stores the data in row groups!
 Wait, what?! Wasn’t it enough complicated even before this? Don’t worry, it’s much easier than it sounds:)

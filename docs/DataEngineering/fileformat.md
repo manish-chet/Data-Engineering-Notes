@@ -32,13 +32,13 @@ It supports all data types, including nested ones, and integrates well with flat
 
 Parquet is considered a de-facto standard for storing data nowadays
 
-Data compression – by applying various encoding and compression algorithms, Parquet file provides reduced memory consumption
+Data compression - by applying various encoding and compression algorithms, Parquet file provides reduced memory consumption
 
-Columnar storage – this is of paramount importance in analytic workloads, where fast data read operation is the key requirement. But, more on that later in the article…
+Columnar storage - this is of paramount importance in analytic workloads, where fast data read operation is the key requirement. But, more on that later in the article…
 
-Language agnostic – as already mentioned previously, developers may use different programming languages to manipulate the data in the Parquet file
+Language agnostic - as already mentioned previously, developers may use different programming languages to manipulate the data in the Parquet file
 
-Open-source format – meaning, you are not locked with a specific vendor
+Open-source format - meaning, you are not locked with a specific vendor
 
 **Why is this additional structure super important?**
  
@@ -87,7 +87,7 @@ Parquet uses several intelligent encoding and compression techniques to reduce f
 
 ![Steps](parnew.svg)
 
-1. Encoding: These techniques transform data into a more compact format before compression.
+1. **Encoding**: These techniques transform data into a more compact format before compression.
 
     **Dictionary Encoding**:
   
@@ -108,7 +108,7 @@ Parquet uses several intelligent encoding and compression techniques to reduce f
     If a column's values (after dictionary encoding) only range from 0 to 3, these values can be stored using just 2 bits per value (00, 01, 10, 11) instead of the standard 8 bits (1 byte) or more.
     This significantly reduces the byte size required to store each value.
 
-2. Compression: After encoding, Parquet applies compression algorithms to further reduce the file size.
+2. **Compression**: After encoding, Parquet applies compression algorithms to further reduce the file size.
  Common compression codecs include Gzip, Snappy, and LZ4.
  The choice of compression can impact performance. For example, Snappy is often much faster for reads than Gzip, even if Gzip provides slightly better compression ratios. The source states that a query running in 3000 seconds with Gzip might run in just 29 seconds with Snappy, making it 100 times faster
 
@@ -130,3 +130,6 @@ This technique uses the row group-level metadata (min/max values for each column
 
 2. **Projection Pruning**:
 This technique capitalizes on Parquet's columnar storage by only reading the columns that are explicitly required by the query.Example: If a query is SELECT name, age FROM users, Parquet will only read the name and age column data from disk and completely skip reading any other columns like address, phone_number, etc.. Since columns are stored separately, this is highly efficient as it avoids bringing unnecessary data into memory, reducing I/O and processing load
+
+
+

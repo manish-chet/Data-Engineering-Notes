@@ -1,0 +1,55 @@
+/* Headings */
+.md-typeset h1, .md-typeset h2, .md-typeset h3 {
+  color: #1A237E;  /* Dark charcoal */
+}
+
+/* Paragraph text */
+.md-typeset p {
+  color: #333333;
+}
+
+/* Inline code */
+.md-typeset code {
+  color:  #212121;
+  background-color: #FAFAFA;
+}
+
+/* Code block */
+.md-typeset pre code {
+  background-color: #F5F5F5;
+  color: #212121;
+}
+
+/* Sidebar navigation link */
+.md-nav__link {
+  color:  #212121;
+}
+.md-nav__link--active {
+  color: #009688;  /* Teal active highlight */
+}
+.md-nav__link:hover {
+  color:  #1A237E;
+}
+
+/* TOC */
+.md-nav--secondary .md-nav__link {
+  color:  #212121;
+}
+.md-nav--secondary .md-nav__link:hover {
+  color: #009688;
+}
+
+/* Highlight box */
+.highlighted-text {
+  background-color: #FFF3E0;
+  color: #BF360C;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Hide first H1 inside the page content */
+.md-content h1:first-of-type {
+  display: none;
+}
+

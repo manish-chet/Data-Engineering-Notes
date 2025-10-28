@@ -1,4 +1,4 @@
-site_name: Data Engineering Works
+site_name: Data Engineering Notes
 site_description: Documentation for Data Engineering and Big Data Technologies
 site_author: Manishkumar Chetpalli
 
@@ -57,17 +57,6 @@ theme:
 
 nav:
   - Home: index.md
-  - Projects:
-    - List of Projects: projects/readme.md
-    - FastAPI Kafka Producer: projects/kafkaapi.md
-    - Flink-Ignite Custom Dialect: projects/flink-ignite.md
-  - Setup Docs:
-    - Jupyter Notebook and JupyterHub: tooling/jupyter_setup.md
-    - Postgres HA : tooling/postgresHA.md
-    - Ignite Multi Node: ignite/igniteinstall.md
-    - Kafka Multi Node SASL_SSL: kafka/kafka_install_zookeeper.md
-    - Airflow Multi Node: airflow/airflow_install_onpremise.md
-    - Kubernetes Installation: devops/kubernetes_install.md
   - Fundamentals:
       - Overview: DataEngineering/DE.md
       - Data Engineering Lifecycle: DataEngineering/DEcycle.md
@@ -86,7 +75,6 @@ nav:
         - SQL Window Functions: sql/window.md
         - SQL Frame clause: sql/frame.md
         - SQL CTE: sql/cte.md
-        - SQL Subqueries: sql/subq.md
         - SQL Indexing: sql/index.md
         - SQL Optimizations: sql/optimize.md
   - BigData:  
@@ -115,31 +103,19 @@ nav:
       - Ignite: ignite/ignite.md
       - Airflow: airflow/airflow.md
       - Spark: 
-        - Spark Overview: spark/overview.md
-        - Spark Architecture: spark/sparkarchitecture.md
-        - Transformations & Actions: spark/sparktrans.md
-        - DAG: spark/DAG.md
-        - SparkSQL Engine: spark/sparksqlengine.md
+        - Overview & Architecture: spark/overview.md
+        - DAG, Transformations & Actions: spark/sparktrans.md
+        - SparkQuery Plan: spark/sparksqlengine.md
         - Resilient Distributed Datasets: spark/Rdd.md
-        - Partition & Bucketing: spark/partition.md
         - SparkSession vs SparkContext: spark/context.md
-        - Job, Stage, Task: spark/job.md
         - Repartition vs Coalesce: spark/repart.md
-        - Spark Deployment Modes: spark/deploymentmode.md
-        - Persist and Caching: spark/spark3.md
-        - Data Skewness: spark/skew.md
+        - Memory management: spark/sparkmemory.md
+        - Spark-Submit & Deployment modes: spark/sparksubmit.md
+        - Adaptive Query Execution: spark/adaptive.md
+        - Caching & Persist: spark/cacheandpersist.md
+        - Dynamic resource allocation & partition pruning: spark/dynamic.md
         - Salting: spark/salting.md
-        - RDD, Dataframe and Dataset: spark/diff2.md
-        - Spark Submit: spark/submit.md
-        - Memory management: spark/memory.md
-        - How to process 1 TB of data in Apache Spark: spark/data.md
-        - Broadcast and Accumulators in Spark: spark/broadcast.md
-        - Handling Failure: spark/handling.md
-        - Code Level and Resource Level Optimizations in Spark: spark/optimize.md
         - Best practices to design Spark application: spark/bp.md
-        - SparkExample: spark/sparkexample.md
-        - SparkExample: spark/Untitled.md
-        - Notebook: spark/Untitled.py
       - Mongo: sql/Mongo.md
   - DevOps:
       - Git: devops/git.md
@@ -153,6 +129,10 @@ nav:
         - Persistent Volumes & Liveness Probes: devops/kube6.md
         - Namespaces & Resource Quotas: devops/kube7.md
         - Horizontal Pod Autoscaling: devops/kube8.md
+  - Cloud computing:
+    - Overview: cloud/overview.md
+    - Databricks:
+      - Overview: cloud/databricks.md
   - Interview Prep:
     - Hadoop : hadoop/hadoopiq.md
     - Hadoop Scenario based: hadoop/hadoopscenarios.md
@@ -208,8 +188,9 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/manish-chet
 
-plugins:
-  - mkdocs-jupyter
+# plugins:
+#   - mkdocs-jupyter:
+#       include_source: true
+#       execute: false
 extra_css:
   - stylesheets/extra.css
-

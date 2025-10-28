@@ -1,0 +1,3779 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for Data Engineering and Big Data Technologies">
+      
+      
+        <meta name="author" content="Manishkumar Chetpalli">
+      
+      
+      
+        <link rel="prev" href="../../airflow/airflowiq/">
+      
+      
+        <link rel="next" href="../../sql/mongoiq/">
+      
+      
+      <link rel="icon" href="../../assets/images/sqldeveloper-original.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Flink - Data Engineering Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#flink_iq" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Data Engineering Notes" class="md-header__button md-logo" aria-label="Data Engineering Notes" data-md-component="logo">
+      
+  <img src="../../assets/images/sqldeveloper-original.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Data Engineering Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Flink
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="light-green"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/manish-chet" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    DataEngineering
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../projects/readme/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tooling/jupyter_setup/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Setup Docs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../DataEngineering/DE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Fundamentals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../hadoop/Bigdata/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  BigData
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../devops/git/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  DevOps
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cloud/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Cloud computing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../hadoop/hadoopiq/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Interview Prep
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  About Me
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Data Engineering Notes" class="md-nav__button md-logo" aria-label="Data Engineering Notes" data-md-component="logo">
+      
+  <img src="../../assets/images/sqldeveloper-original.svg" alt="logo">
+
+    </a>
+    Data Engineering Notes
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/manish-chet" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    DataEngineering
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Projects
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Projects
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/readme/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    List of Projects
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/kafkaapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FastAPI Kafka Producer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../projects/flink-ignite/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flink-Ignite Custom Dialect
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Setup Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Setup Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tooling/jupyter_setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jupyter Notebook and JupyterHub
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tooling/postgresHA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Postgres HA
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ignite/igniteinstall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Ignite Multi Node
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/kafka_install_zookeeper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kafka Multi Node SASL_SSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../airflow/airflow_install_onpremise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Airflow Multi Node
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kubernetes_install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kubernetes Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Fundamentals
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Fundamentals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/DE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/DEcycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Engineering Lifecycle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/DEundercurrent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Engineering UnderCurrents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/DesigningGDA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Architecture & Design
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../airflow/dataorchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Orchestration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/fileformat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    File Formats
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sql/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    SQL
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            SQL
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/sql/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/datatype/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL Data Types
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/typeofcommands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Types of commands in SQL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/constraints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL Constraints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/joins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL Joins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/views/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL Views
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/window/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL Window Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/frame/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL Frame clause
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/cte/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL CTE
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/optimize/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SQL Optimizations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    BigData
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            BigData
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/Bigdata/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/HDFS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    HDFS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/mapreduce/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MapReduce
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/yarn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    YARN
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/kerberos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kerberos
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Hive
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            Hive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hive/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hive/serde/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SerDe
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hive/partition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Partitioning & bucketing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hive/join/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Joins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_7" id="__nav_5_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Kafka
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_7">
+            <span class="md-nav__icon md-icon"></span>
+            Kafka
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/zookeeper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Role of Zookeeper
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/partition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Partitions & Replciations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/offsets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Offsets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/logsegments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Log segments
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/producer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Producers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/failures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handling Producer Failures
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/consumer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Consumers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/time/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Index & Timeindex
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/trade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Unclean Leader Election & Availability vs Durability Trade-Off
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ignite/ignite/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Ignite
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../airflow/airflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Airflow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_10" id="__nav_5_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Spark
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_10">
+            <span class="md-nav__icon md-icon"></span>
+            Spark
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview & Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/sparktrans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    DAG, Transformations & Actions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/sparksqlengine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SparkQuery Plan
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/Rdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Resilient Distributed Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SparkSession vs SparkContext
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/repart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Repartition vs Coalesce
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/sparkmemory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Memory management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/sparksubmit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Spark-Submit & Deployment modes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/adaptive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Adaptive Query Execution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/cacheandpersist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Caching & Persist
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/dynamic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dynamic resource allocation & partition pruning
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/salting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Salting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/bp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Best practices to design Spark application
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/jupyter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Notebook
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/Mongo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mongo
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    DevOps
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            DevOps
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Git
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Docker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Kubernetes
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            Kubernetes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kubernetesarchitecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Labels, Selectors, and Replication Controllers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jobs, init container and pod lifecycle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Deploying object
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Networking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Persistent Volumes & Liveness Probes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Namespaces & Resource Quotas
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Horizontal Pod Autoscaling
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Cloud computing
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Cloud computing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2" id="__nav_7_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Databricks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2">
+            <span class="md-nav__icon md-icon"></span>
+            Databricks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/databricks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Interview Prep
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Interview Prep
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/hadoopiq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Hadoop
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/hadoopscenarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Hadoop Scenario based
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/iq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Kafka
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../airflow/airflowiq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Airflow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flink
+    
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/mongoiq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MongoDB
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    About Me
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="flink_iq">FLINK_IQ<a class="headerlink" href="#flink_iq" title="Permanent link">#</a></h1>
+<div class="admonition - info">
+<p class="admonition-title">1. See you using Flink, briefly introduce Flink?</p>
+<p>Apache Flink is an open-source stream processing and batch processing framework designed for big data processing and analytics. It provides fault tolerance, high throughput, and low-latency processing of large-scale data streams</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">2. What are the differences between Flink and Spark Streaming?</p>
+<ol>
+<li>The design ideas are different. Flink considers batch to be a kind of streaming, and spark considers a streaming batch.</li>
+<li>The architecture model is different. Spark has Driver, Master, Worker, and Executor. Flink has the concepts of TaskManager, JobManager, Task, SubTask, and Slot</li>
+<li>Flink's streaming data processing is much stronger than spark, for example, time supports three kinds of time
+There are more windows than spark</li>
+<li>In the case of out-of-order data, Flink is stronger than spark, because flink has watermark. In fact, the calculation method when running is the time of the last data-if watermaker is greater than the end of the window, execute</li>
+<li>For fault tolerance, flink is also better than spark. For example, flink supports two-stage transactions to ensure that data after program crashes will not be re-consumed. Spark also has checkpoints, but it only ensures that data is not lost, and it cannot be repeated. consumption.</li>
+</ol>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">3. What are the roles of Flink cluster? What are the functions?</p>
+<p>Flink programs mainly have three roles: TaskManager, JobManager, and Client when they are running.</p>
+<p>JobManager In the role of a manager in the cluster, it is the coordinator of the entire cluster. It is responsible for receiving the execution of Flink Job, coordinating checkpoints, recovering from failures, and managing Task Manager.</p>
+<p>TaskManager It is responsible for the resource information on the node where the manager is located, such as memory, disk, and network. It will report the resource to the JobManager when it is started.</p>
+<p>Client It is the client submitted by the Flink program. When a user submits a Flink program, a Client is first created. Then the program submitted by the user will be preprocessed and submitted to the cluster for processing.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">4. What is TaskSlot?</p>
+<p>In Flink's architecture, TaskManager is the working node that is actually used to execute our program. TaskManager is a JVM process. In fact, in order to achieve the concept of resource isolation and parallel execution, the concept of TaskSlot was proposed at this time, which is actually In order to control how many Tasks the TaskManager can receive, the TaskManager is controlled by taskslot, that is, if we have a source that specifies three parallelism, then he will use three slots, and the other one needs to be mainly parallel as an operator When the degree is the same, and there is no change in the degree of parallelism, or there is no shuffle, they will be together at this time. This is an optimized concept.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">5. What are the commonly used operators in Flink?</p>
+<p>Map operator</p>
+<p>Filter operator</p>
+<p>KeyBy operator</p>
+<p>Window window</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">6. What is the parallelism of Flink and What is the parallelism setting of Flink?</p>
+<p>The parallelism of Flink is well understood. For example, kafkaSource, its parallelism is the number of partitions by default. The degree of parallelism is this operator, and how many taskslot are needed, we should know that is the advantage of parallel computing. Generally, the degree of parallelism is set according to the amount of data. It is best to keep the source and map operators without shuffle, because the pressure on the source and map operators is not very large, but when our data table is widened, It is better to set it larger.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">7. What is the relationship between Flink's Slot and parallelism?</p>
+<p>slot is a concept in TaskManager. Parallelism is a concept in the program, that is, the concept of execution level. In fact, slot specifies how many slots this TaskManager has and how much parallelism can be supported, but the parallelism developed by the program uses slots That is slot, that is, TaskManager is the provider and the program is the user</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">8. What if Flink encounters an abnormal restart of the program?</p>
+<p>Flink has some restart strategies, and as long as the checkpoint is done, it can be done at least once. Of course, it may not be accurate once, but some components can be done. The restart strategy generally set is a fixed delay restart strategy. The restart does not delete the checkpoint. Generally, the number of restarts set by our company is 4 times. If it stops, we will send a nail warning and start from the checkpoint when it starts.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">9. Flink's distributed cache</p>
+<p>The distributed cache implemented by Flink is similar to Hadoop. The purpose is to read the file locally and put it in the taskmanager node to prevent the task from repeatedly pulling data and reduce performance.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">10. Broadcast variables in Flink</p>
+<p>We know that Flink is parallel, and the calculation process may not be performed in a Slot. Then there is a situation: when we need to access the same data. Then the broadcast variable in Flink is to solve this situation. We can understand the broadcast variable as a public shared variable. We can broadcast a dataset, and then different tasks can be obtained on the node. There will only be one copy of this data on each node.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">11. Do you know what windows in Flink are?</p>
+<p>Flink supports two ways to divide windows, according to time and count. session is also a kind of time</p>
+<p>Tumbing Count Window： Perform calculation when reaching a certain number, no folding</p>
+<p>Sliding Time Window： When a certain period of time is reached, roll over, there can be overlap, generally used to calculate the recent demand, such as nearly 5 minutes.</p>
+<p>Tubing time Window： When a certain period of time is reached, the slide is carried out, which can be thought of as the Nokia slide phone used before. This is actually a micro batch</p>
+<p>Sliding Count Window： Slide when it reaches a certain number</p>
+<p>Session Window: The window data has no fixed size, it is divided according to the parameters passed in by the user, and the window data does not overlap. It is similar to calculating the user's previous actions when the user logs out.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">12. Flink's state storage?</p>
+<p>Flink often needs to store intermediate states during calculations to avoid data loss and recover from abnormal states. Choosing a different state storage strategy will affect the state interaction between JobManager and Subtask, that is, JobManager will interact with State to store state.</p>
+<p>Flink provides three state storage:
+MemoryStateBackend</p>
+<p>FsSateBackend</p>
+<p>RocksDBStateBackend</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">13. What kind of time are there in Flink?</p>
+<p>Event time: the time when the event actually occurred</p>
+<p>Intake time: time to enter flink</p>
+<p>Processing time: the time to enter the flink operator</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">14. What is Watermark in Flink?</p>
+<p>Watermark is an operation used by Flink to deal with out-of-order time. In fact, in Flink, if we use event time and take kafka's source, then the window execution time at this time is the smallest among the partitions Partitions are used for triggering, and each partition must be triggered to perform calculations. Why is this? In fact, it is because the partitions of Kafka are disordered. Orderly in the zone. The execution time is the maximum time minus the watermark&gt;window end time, and the calculation will be executed at this time.
+Watermarks are used in Apache Flink to track the progress of event time. They represent a threshold for event times and indicate that no events with timestamps earlier than the watermark should arrive any longer. They help define when window computations should be considered complete.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">15. What is Unbounded streams in Apache Flink?</p>
+<p>Any type of data is produced as a stream of events. Data can be processed as unbounded or bounded streams.
+Unbounded streams have a beginning but no end. They do not end and continue to provide data as it is produced. Unbounded streams should be processed continuously, i.e., events should be handled as soon as they are consumed. Since the input is unbounded and will not be complete at any point in time, it is not possible to wait for all of the data to arrive.
+Processing unbounded data sometimes requires that events are consuming in a specific order, such as the order in which events arrives, to be able to reason about result completeness.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">16. What is Bounded streams in Apache Flink?</p>
+<p>Bounded streams have a beginning and an end point. Bounded streams could be processed by consuming all data before doing any computations. Ordered ingestion is not needed to process bounded streams since a bounded data set could always be sorted. Processing of bounded streams is also called as batch processing.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">17. What is Dataset API in Apache Flink?</p>
+<p>The Apache Flink Dataset API is used to do batch operations on data over time. This API is available in Java, Scala, and Python. It may perform various transformations on datasets such as filtering, mapping, aggregating, joining, and grouping.</p>
+<p>DataSet API helps us in enabling the client to actualize activities like a guide, channel, gathering and so on.It is utilized for appropriated preparing, it is an uncommon instance of stream preparing where we have a limited information source.They are regular programs that implement transformation on data sets like filtering, mapping, etc.</p>
+<p>Data sets are created from sources like reading files, local collections, etc.All the results are returned through sinks, the execution can happen in a local JVM or on clusters of many machines.</p>
+<p>DataSet<Tuple2\<String, Integer>> wordCounts = text
+.flatMap(new LineSplitter())
+.groupBy(0)
+.sum(1);</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">18. What is DataStream API in Apache Flink?</p>
+<p>The Apache Flink DataStream API is used to handle data in a continuous stream. On the stream data, you can perform operations such as filtering, routing, windowing, and aggregation. On this data stream, there are different sources such as message queues, files, and socket streams, and the resulting data can be written to different sinks such as command line terminals. This API is supported by the Java and Scala programming languages.</p>
+<p>DataStream<Tuple2\<String, Integer>> dataStream = env
+.socketTextStream("localhost", 9091)
+.flatMap(new Splitter())
+.keyBy(0)
+.timeWindow(Time.seconds(7))
+.sum(1);</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">19. What is Apache Flink Table API?</p>
+<p>Table API is a relational API with an expression language similar to SQL. This API is capable of batch and stream processing. It is compatible with the Java and Scala Dataset and Datastream APIs. Tables can be generated from internal Datasets and Datastreams as well as from external data sources. You can use this relational API to perform operations such as join, select, aggregate, and filter. The semantics of the query are the same if the input is batch or stream.
+val tableEnvironment = TableEnvironment.getTableEnvironment(env)
+// register a Table
+tableEnvironment.registerTable("TestTable1", ...);
+// create a new Table from a Table API query
+val newTable2 = tableEnvironment.scan(TestTable1).select(...);</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">20. What is Apache Flink FlinkML?</p>
+<p>FlinkML is the Flink Machine Learning (ML) library. It is a new initiative in the Flink community, with an expanding list of algorithms and contributors. FlinkML aims to include scalable ML algorithms, an easy-to-use API, and tools to help reduce glue code in end-to-end ML systems. Note: Flink Community has planned to delete/deprecate the legacy flink-libraries/flink-ml package in Flink1.9, and replace it with the new flink-ml interface proposed in FLIP39 and FLINK-12470.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">21. Explain the Apache Flink Job Execution Architecture?</p>
+<p>Program: It is a piece of code that is executed on the Flink Cluster.</p>
+<p>Client: It is in charge of taking code from the given programm and creating a job dataflow graph, which is then passed to JobManager. It also retrieves the Job data.</p>
+<p>JobManager: It is responsible for generating the execution graph after obtaining the Job Dataflow Graph from the Client. It assigns the job to TaskManagers in the cluster and monitors its execution.</p>
+<p>TaskManager:It is in charge of executing all of the tasks assigned to it by JobManager. Both TaskManagers execute the tasks in their respective slots in the specified parallelism. It is in charge of informing JobManager about the status of the tasks.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">22. What are the features of Apache Flink?</p>
+<p>One of the key features of Apache Flink is its ability to process data in real-time with low-latency and high throughput. It supports event time processing, which means it can handle out-of-order events and provide correct results based on event timestamps. Flink also provides extensive windowing operations for aggregating data within time intervals, such as tumbling windows, sliding windows, and session windows.</p>
+<p>Another important feature of Flink is its support for fault-tolerance. It achieves fault-tolerance through a mechanism called "exactly-once" processing, which guarantees that each event is processed exactly once, even in the presence of failures. This is crucial for applications where data correctness is paramount.</p>
+<p>Apache Flink can process all data in the form of streams at any point in time.
+Apache Flink does not give a burden on users' shoulders for tunning or managing the physical execution concepts.
+The memory management is done by the Apache Flink itself and not by the user.
+Apache Flink optimizer chooses the best plan to execute the user's program hence very little intervention is required in terms of tunning.
+Apache Flink can be deployed on various cluster frameworks.
+It is capable to support various types of the file system.
+Apache Flink can be integrated with Hadoop YARN in a very good way.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">23. What are the Apache Flink domain-specific libraries?</p>
+<p>The following is the list of Apache Flink domain-specific libraries.
+FlinkML: It is used for machine learning.
+Table: It is used to perform the relational operation.
+Gelly: It is used to perform the Graph operation.
+CEP: It is used for complex event processing.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">24. What is the programing model of Apache Flink?</p>
+<p>The Apache Flink Datastream and the Dataset work as a programming model of flink and its other layers of architecture. The Datastream programming model is useful in real-time stream processing whereas the Dataset programming model is useful in batch processing.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">25. What are the use cases of Apache Flink?</p>
+<p>Many real-world industries are using Apache Flink and their use cases are as mentioned below.</p>
+<p>Financial Services
+Financial industries are using Flink to perform fraud detection in real-time and send mobile notifications.</p>
+<p>Healthcare
+The hospitals are using Apache Flink to collect data from devices such as MRI, IVs for real-time issue detection and analysis.</p>
+<p>Ad Tech
+Ads companies are using Flink to find out the real-time customer preference.</p>
+<p>Oil Gas
+The Oil and Gas industries are using Flink for real-time monitoring of pumping and issue detection.</p>
+<p>Telecommunications
+The telecom companies are using Apache Flink to provide the best services to the users such as real-time view of billing and payment, the optimization of antenna per-user location, mobile offers, and so on.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">26. What is bounded and unbounded data in Apache Flink?</p>
+<p>Apache Flink processes data in the form of bounded and unbounded streams. The bounded data will have a start point and an endpoint and the computation starts once all data has arrived. It is also called batch processing. The unbounded data will have a start point but no endpoint because it is streaming of data. The processing of unbounded data is continous and doesn't wait for complete data. As soon the data is generated the processing will start.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">27. How Apache Flink handles the fault-tolerance?</p>
+<p>Apache Flink manages the fault-tolerance of stream applications by capturing the snapshot of the streaming dataflow state so in case of failure those snapshots will be used for recovery. For batch processing, Flink uses the program's sequence of transformations for recovery.</p>
+<p>To achieve fault tolerance, Apache Flink employs a combination of techniques such as data replication, checkpointing, and exactly-once processing semantics. The framework allows users to define fault-tolerant data streams, which are resilient to failures and can effectively recover from possible errors.</p>
+<ol>
+<li>
+<p>Checkpointing: Apache Flink periodically captures the state of executing jobs by taking checkpoints. Checkpoints consist of the in-memory state of all operators and the metadata necessary for restoring the state, such as the offset of each stream source. Users can configure the frequency of checkpoints to strike a balance between reliability and performance</p>
+</li>
+<li>
+<p>State Backends: Apache Flink supports different state backends (e.g., in-memory, RocksDB) to persist checkpointed state. The chosen backend determines how and where the state is stored, allowing for fault tolerance and efficient recovery.</p>
+</li>
+<li>
+<p>Exactly-once Processing: Flink's checkpointing, along with its transactional processing capabilities, enables exactly-once processing semantics. It ensures that each record is processed exactly once, even in the presence of failures or system restarts. This guarantees consistency and correctness in data processing.</p>
+</li>
+<li>
+<p>Failure Handling: In case of failures, Flink automatically reverts the system to the latest successful checkpoint. It replays the data from that point onwards, resuming processing from a consistent state.</p>
+</li>
+</ol>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">28. What is the responsibility of JobManager in Apache Flink Cluster?</p>
+<p>The Job Manager is responsible for managing and coordinating with distributed processing of a program. It assigns the task to node managers, handles the failures for recovery, and performs the checkpointing. It has three components namely ResourceManager, Dispatcher, and JobMaster.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">29. What is the responsibility of TaskManager in Apache Flink Cluster?</p>
+<p>The Task Manager is responsible for executing the dataflow task and return the result to JobManager. It executes the task in the form of a slot hence the number of slots shows the number of process execution.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">30. What is the difference between stream processing and batch processing?</p>
+<p>In Batch processing, the data is a bounded set of the stream that has a start point and the endpoint, so once the entire data is ingested then only processing starts in batch processing mode. In-stream processing the nature of data is unbounded which means the processing will continue as the data will be received.</p>
+<p>Flink How to ensure accurate one-time consumption
+Flink There are two ways to ensure accurate one-time consumption Flink Mechanism
+1、Checkpoint Mechanism
+2、 Two stage submission mechanism</p>
+<p>Checkpoint Mechanism:Mainly when Flink Turn on Checkpoint When , Will turn out for the Source Insert a barrir, And then this barrir As the data flows all the time , When it comes to an operator , This operator starts to make checkpoint, It's made from barrir The state of the current operator when it comes to the previous time , Write the state to the state backend . And then barrir Flow down , When it flows to keyby perhaps shuffle Operator time , For example, when the data of an operator , Depending on multiple streams , There will be barrir alignment , That is, when all barrir All come to this operator to make checkpoint, Flow in turn , When it flows to sink Operator time , also sink The operator is also finished checkpoint Will send to jobmanager The report checkpoint n Production complete .</p>
+<p>Two stage submission mechanism: Flink Provides CheckpointedFunction And CheckpointListener These two interfaces ,CheckpointedFunction There is snapshotState Method , Every time checkpoint Trigger execution method , The cache data is usually put into the State , You can think of it as one hook, This method can be used to achieve pre submission ,CheckpointListyener There is notifyCheckpointComplete Method ,checkpoint Notification method after completion , There are some extra operations that can be done here . for example FLinkKafkaConumerBase Use this to do Kafka offset Submission of , In this method, you can implement the submit operation . stay 2PC If the corresponding process, such as a checkpoint Failure words , that checkpoint It will roll back , No impact on data consistency , So if you're informing checkpoint Success followed by failure , Then it will be in initalizeSate Method to complete the transaction commit , This ensures data consistency . It's mainly based on checkpoint The state file to judge .</p>
+<p>flink and spark difference: flink It's a similar spark Of " Open source technology stack ", Because it also provides batch processing , Flow computation , Figure calculation , Interactive query , Machine learning, etc .flink It's also memory computing , similar spark, But the difference is ,spark The calculation model of is based on RDD, Consider streaming as a special batch process , His DStream In fact, or RDD. and flink Consider batch processing as a special stream computing , But there are two engines in the layer of batch processing and streaming computing , Abstract the DataSet and DataStream.flink It's also very good in performance , Streaming delay ratio spark Less , Can do real flow computing , and spark It can only be a quasi flow calculation . And in batch processing , When the number of iterations gets more ,flink Faster than spark faster , So if flink Come out earlier , Maybe more than what we have now Spark More fire .</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">31. Flink watermark Transmission mechanism.</p>
+<p>Flink Medium watermark Mechanism is used to deal with disorder ,flink It has to be event time , A simple example is , If the window is 5 second ,watermark yes 2 second , that All in all 7 second , When will calculation be triggered at this time , Suppose the initial time of the data is 1000, Then wait until 6999 It will trigger 5999 The calculation of windows , So the next one is 13999 Is triggered when 10999 The window of
+In fact, this is watermark The mechanism of , In multi parallelism , For example, in kafka The window will not be triggered until all partitions are reached</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">32. Flink window join:</p>
+<p>1、window join, That is, according to the specified fields and scrolling sliding window and session window inner join</p>
+<p>2、 yes coGoup In fact, that is left join and right join,</p>
+<p>3、interval join That is to say In the window join There are some problems , Because some of the data really came after the meeting , It's still a long time , Then there will be interval join But it has to be the time of the event , And also specify watermark And water level and getting event timestamps . And set it up Offset interval , because join I can't wait all the time .</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">33. keyedProcessFunction How it works</p>
+<p>keyedProcessFunction There is one ontime Operation of the , If so event In time that The time to call is to look at ,event Of watermark Is it greater than trigger time Time for , If it is greater than, calculate it , No, just wait , If it is kafka Words , Then the default is to trigger the partition key in the shortest time .</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">34. How to deal with offline data such as the association with offline data?</p>
+<p>1、async io
+2、broadcast
+3、async io + cache
+4、open Method , Then the thread is refreshed at a fixed time , Cache updates are deleted first , Then write another one, and then write to the cache</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">35. What if there is a data skew?</p>
+<p>Flink How to view data skew ：
+stay flink Of web ui You can see the data skew in , It's every one subtask The amount of data processed varies greatly , For example, some have only one M yes , we have 100M This is a serious data skew .
+KafkaSource Data skew at the end
+For example, upstream kafka It was specified when it was sent key There are data hotspots , So just after the access , Do a load balancing （ The premise is not keyby）.
+Aggregation class operator data skew
+Pre aggregation plus global aggregation</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">36. FlinkTopN And offline TopN The difference between?</p>
+<p>topn It is a common function in both offline and real-time computing , It's different from... In offline computing topn, Real time data is continuous , This will give topn It's very difficult to calculate , Because it's going to keep a... In memory topn Data structure of , When new data comes , Update this data structure</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">37. Sparkstreaming and flink in checkpoint?</p>
+<p>sparkstreaming Of checkpoint It will lead to repeated consumption of data
+however flink Of checkpoint Sure Make sure it's accurate one time , At the same time, it can be incremental , fast checkpoint Of , There are three states ,memery、rocksdb、hdfs</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">38. A brief introduction cep State programming:</p>
+<p>Complex Event Processing（CEP）：
+FLink Cep Is in FLink Complex time processing library implemented in ,CEP Allows event patterns to be detected in an endless stream of time , Give us a chance to grasp the important parts of the data , One or more time streams composed of simple events are matched by certain rules , Then output the data the user wants , That is, complex events that satisfy the rules .</p>
+<p>Flink Data aggregation in , How to aggregate without windows
+valueState Used to save a single value
+ListState Used to hold list Elements
+MapState Used to save a set of key value pairs
+ReducingState Provided with ListState Same method , Return to one ReducingFunction The aggregated value .
+AggregatingState and ReducingState similar , Return to one AggregatingState The value after internal aggregation</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">39. How to deal with abnormal data in Flink.</p>
+<p>Abnormal data in our scenario , It is generally divided into missing fields and outlier data .
+outliers ： For example, data on the age of the baby , For example, for the maternal and infant industry , The age of a baby is a crucial data , It's the most important , Because the baby is bigger than 3 At the age of 20, you hardly buy things from mothers and babies . There are days like ours 、 Unknown 、 And for a long time . This is an exception field , We will show the data to store managers and regional managers , Let them know how many ages are not allowed . If we have to deal with it , It can be corrected in real time according to the time of purchase , For example, maternity clothing 、 The rank of milk powder 、 The size of a diaper , As well as pacifiers, some can distinguish the age group to carry on the processing . We don't process the data in real time , We're going to have a low-level strategy task, night dimension, to run , Run once a week .
+Missing field ： For example, some fields are really missing , If you can fix it, you can fix it . Give up if you can't fix it , It's like the news recommendation filter in the last company .</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">40. Is there any possibility of data loss in Flink?</p>
+<p>Flink There are three kinds of data consumption semantics ：
+At Most Once One consumption at most In case of failure, it may be lost
+At Least Once At least once If there is a fault, it may be repeated
+Exactly-Once Exactly once If something goes wrong , It can also ensure that the data will not be lost or repeated .
+flink The new version is no longer available At-Most-Once semantics .</p>
+<p>Flink interval join Can you write it simply
+DataStream<T> keyed1 = ds1.keyBy(o -&gt; o.getString("key"))
+DataStream<T> keyed2 = ds2.keyBy(o -&gt; o.getString("key"))
+// Time stamp on the right -5s&lt;= Stream timestamp on the left &lt;= Time stamp on the right -1s
+keyed1.intervalJoin(keyed2).between(Time.milliseconds(-5), Time.milliseconds(5))</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">41. How to maintain Checkpoint?</p>
+<p>By default , If set Checkpoint Options ,Flink Only the most recently generated 1 individual Checkpoint. When Flink When the program fails , From the nearest one Checkpoint To recover . however , If we want to keep more than one Checkpoint, And can choose one of them to recover according to the actual needs , It's more flexible .Flink Support to keep multiple Checkpoint, Need to be in Flink Configuration file for conf/flink-conf.yaml in , Add the following configuration to specify that at most Checkpoint The number of .
+For small files, please refer to The death of Daedalus - Solutions to the problem of small files in the field of big data .</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">42. What's the difference at Spark and Flink Serialization?</p>
+<p>Spark The default is Java Serialization mechanism , At the same time, there is an optimization mechanism , That is to say kryo
+Flink It's a self implemented serialization mechanism , That is to say TypeInformation</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">43. How to deal with late data?</p>
+<p>In Flink, late data refers to events that arrive after the watermark has progressed past their event time. This typically happens due to network delays, out-of-order arrival, or slow event sources.</p>
+<p>To handle late data, Flink provides the following mechanisms:</p>
+<p>Allowed Lateness
+You can configure how long Flink should wait for late events using the allowedLateness() method.</p>
+<p>java
+Copy
+Edit
+.window(TumblingEventTimeWindows.of(Time.minutes(5)))
+.allowedLateness(Time.minutes(2))
+This keeps the window open for 2 extra minutes to accept late events.</p>
+<p>Late elements within this period will update the window and trigger re-evaluation.</p>
+<p>Side Output for Late Data
+Events that arrive after the allowed lateness can be redirected to a side output for separate handling.</p>
+<p>java
+Copy
+Edit
+OutputTag<Event> lateOutputTag = new OutputTag<Event>("late-data"){};
+windowedStream
+    .sideOutputLateData(lateOutputTag);
+You can process or store this late data elsewhere for analysis or alerting.</p>
+<p>Watermarks Configuration</p>
+<p>Watermarks indicate the progress of event time. You can use bounded out-of-orderness watermarks to tolerate out-of-order events.</p>
+<p>java
+Copy
+Edit
+env.assignTimestampsAndWatermarks(
+    WatermarkStrategy.<Event>forBoundedOutOfOrderness(Duration.ofMinutes(2))
+);</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">44. When to use aggregate perhaps process:</p>
+<p>aggregate： Incremental aggregation
+process： Total polymerization
+When calculating the accumulation operation, you can use aggregate operation .
+When calculating the full amount of data in the window, use process, For example, sorting and other operations.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">45. How does Flink handle stateful computations efficiently:</p>
+<p>Flink is designed to handle stateful computations efficiently by using a distributed and fault-tolerant mechanism called StateBackend. It provides several options for managing state, including in-memory state and state that can be stored on disk or in an external system like Apache Hadoop or Amazon S3.</p>
+<p>Flink's StateBackend allows users to choose between three options: MemoryStateBackend, FsStateBackend, and RocksDBStateBackend. These options differ in terms of their trade-offs between performance and fault tolerance. For example, the MemoryStateBackend provides high performance and low latency but does not recover state after a failure, while the FsStateBackend provides fault tolerance by storing state on a distributed file system.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">46. What are the important factors to consider when tuning the performance of Apache Flink applications:</p>
+<p>When tuning the performance of Apache Flink applications, several important factors need to be considered. These factors range from resource allocation to algorithm design and configuration settings. Here are some key aspects to focus on:</p>
+<ol>
+<li>
+<p>Resource Allocation: Efficiently allocating resources is crucial for optimal performance. This includes tuning the number of Task Managers and slots, Memory, and CPU resources. Understanding the data and workload patterns can help determine the right resource allocation strategy.</p>
+</li>
+<li>
+<p>Data Serialization and Deserialization: Choosing the appropriate serialization format can greatly impact performance. Flink provides multiple serialization formats, such as Avro, JSON, and Protobuf. Assessing the size and complexity of data structures can help decide the most suitable serialization method.</p>
+</li>
+<li>
+<p>Memory Management: Flink employs managed memory which consists of both heap and off-heap memory. Configuring the sizes of managed memory components, such as network buffers and managed memory fractions, can significantly impact performance</p>
+</li>
+<li>
+<p>Parallelism: Parallelism influences the throughput and resource utilization of Flink applications. Setting an appropriate degree of parallelism, considering the available resources and input characteristics, is important.</p>
+</li>
+<li>
+<p>Operators' Chaining and State Size: Operator chaining can optimize performance by reducing serialization and deserialization costs. Additionally, Flink provides various state backends, such as MemoryStateBackend and RocksDBStateBackend, that allow selecting different state storage options based on the state size and access patterns.</p>
+</li>
+</ol>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">47. How does Flink handle exactly-once semantics and end-to-end consistency in data processing?:</p>
+<p>Apache Flink provides built-in mechanisms to handle exactly-once semantics and ensure end-to-end consistency in data processing pipelines. This is essential in scenarios where duplicate or lost data cannot be tolerated, such as financial transactions, data pipelines, or event-driven applications.</p>
+<p>Flink achieves exactly-once semantics through a combination of checkpointing, state management, and transactional sinks. Checkpointing is a mechanism that periodically takes a snapshot of the application's state, including the operator's internal state and the position in the input streams. By storing these checkpoints persistently, Flink can recover the state and precisely revert to a previous consistent state when failures occur. The state managed by operators includes both user-defined operator state and Flink's internal bookkeeping state.</p>
+<p>To enable exactly-once semantics, it is important to ensure that the output of the pipeline is also processed atomically and deterministically. Flink achieves this through transactional sinks, which are responsible for writing the output of a stream into an external system (e.g., a database). When a failure occurs, these sinks coordinate with Flink's checkpointing to guarantee that the data is only committed if the checkpoint is successful. This ensures that the output of the pipeline is consistent and non-duplicative</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">48. How does Flink handle windowing in stream processing?:</p>
+<p>Flink supports various windowing operations, such as tumbling windows, sliding windows, and session windows. Windowing in Flink allows you to group and process events based on time or count constraints. It provides flexibility in defining window sizes and slide intervals.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">49. If everything is a stream, why are there a DataStream and a DataSet API in Flink?:</p>
+<p>Bounded streams are often more efficient to process than unbounded streams. Processing unbounded streams of events in (near) real-time requires the system to be able to immediately act on events and to produce intermediate results (often with low latency). Processing bounded streams usually does not require producing low latency results, because the data is a while old anyway (in relative terms). That allows Flink to process the data in a simple and more efficient way.</p>
+<p>The DataStream API captures the continuous processing of unbounded and bounded streams, with a model that supports low latency results and flexible reaction to events and time (including event time).
+The DataSet API has techniques that often speed up the processing of bounded data streams. In the future, the community plans to combine these optimizations with the techniques in the DataStream API.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">50. What are windowing strategies in Flink?</p>
+<p>Windowing assigns unbounded streams into finite-sized windows for aggregation. Common strategies include: Time windows (fixed or sliding), Count windows (fixed number of events), and Session windows (gaps between events define windows).</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">51. What are the different types of operators in Flink?:</p>
+<p>Flink operators include <em>map</em>, <em>flatmap</em>, <em>filter</em>, <em>keyBy</em>, <em>window</em>, <em>reduce</em>, <em>aggregate</em>, <em>join</em>, etc., offering a rich set of transformations for data processing.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">52. What is the difference between a keyed and non-keyed stream in Flink?:</p>
+<p>Keyed streams partition data based on a key, enabling operations like windowing and stateful aggregations on specific keys. Non-keyed streams process data without partitioning.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">53. Explain the role of the process function in Flink.</p>
+<p>Process functions are low-level operators that provide fine-grained control over event processing and state management. They offer advanced features like timers and custom state management logic.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">54. What are the different windowing techniques in Apache Flink?:</p>
+<p>Apache Flink supports a variety of windowing techniques, including:</p>
+<p>Tumbling windows: These windows are fixed in size and slide across the stream.</p>
+<p>Sliding windows: These windows are variable in size and slide across the stream.</p>
+<p>Session windows: These windows are based on the arrival time of events.</p>
+<p>Count windows: These windows are based on the number of events that arrive within a given time interval.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">55. What is the difference between bounded and unbounded streams?:</p>
+<p>Bounded streams are datasets that have a defined start and end.
+Unbounded streams are datasets that have a defined start but no defined end.
+Bounded streams can be processed by ingesting the complete data and them preforming any computations.
+Unbounded streams have to be processed continuously as new data comes in.
+In most cases, unbounded streams have to be process in the order in which messages are received.
+Bounded messages can be processed in any order since the messages can be sorted as needed.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">56. What features does flink framework provide to handle state?</p>
+<p>Flink framework provides the following features to handle state.
+Data structure specific state primitives - Flink framework provides specific state primitives for different data structures such as lists and maps.
+Pluggable state storages - Flink supports multiple pluggable state storage systems that store state in-memory or on disc.
+Exactly-once state consistency - Flink framework has checkpoint and recovery algorithms, which guarantee the consistency of state in case of failures.
+Store large state data - Flink has the ability to store very large application state data, of several terabytes, due to its asynchronous and incremental checkpoint algorithm.
+Scalable Applications - Flink applications are highly scalable since the application state data can be distributed across containers.</p>
+</div>
+<div class="admonition - info">
+<p class="admonition-title">57. What features does flink framework provide to handle time?:</p>
+<p>Flink framework provides the following features to handle time.
+Event-time mode - Flink framework supports applications that process steams based on event-time mode, i.e. applications that process streams based on timestamp of events.
+Processing-time mode - Flink framework also supports applications that process streams based on processing-time mode, i.e. applications that process streams based on the clock time of the processing machine.
+Watermark support Flink framework provides watermark support in the processing of streams based on event-time mode.
+Late data processing Flink framework supports the processing of events that arrive late, after a related computation has already been performed.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../airflow/airflowiq/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Airflow">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Airflow
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../sql/mongoiq/" class="md-footer__link md-footer__link--next" aria-label="Next: MongoDB">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                MongoDB
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Manishkumar Chetpalli
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/manishkumarchetpalli/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5m282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/manish-chet" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.annotation", "content.code.copy", "content.tooltips", "content.tabs.link", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.top", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.instant.preview", "navigation.tracking", "navigation.path", "search.highlight", "search.suggest", "search.share", "navigation.footer", "content.action.feedback", "toc.follow", "toc.extend"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
