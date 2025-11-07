@@ -64,19 +64,7 @@ nav:
       - Data Architecture & Design: DataEngineering/DesigningGDA.md
       - Data Orchestration: airflow/dataorchestration.md
       - File Formats: DataEngineering/fileformat.md
-      - SQL:
-        - SQL Overview: sql/sql.md
-        - SQL Data Types: sql/datatype.md
-        - Types of commands in SQL: sql/typeofcommands.md
-        - SQL Constraints: sql/constraints.md
-        - SQL Functions: sql/functions.md
-        - SQL Joins: sql/joins.md
-        - SQL Views: sql/views.md
-        - SQL Window Functions: sql/window.md
-        - SQL Frame clause: sql/frame.md
-        - SQL CTE: sql/cte.md
-        - SQL Indexing: sql/index.md
-        - SQL Optimizations: sql/optimize.md
+      - SQL: sql/sql.md
   - BigData:  
       - Overview: hadoop/Bigdata.md
       - HDFS:  hadoop/HDFS.md
@@ -121,6 +109,7 @@ nav:
       - Git: devops/git.md
       - Docker: devops/docker.md
       - Kubernetes:
+        - Architecture: devops/kubernetesarchitecture.md
         - Architecture: devops/kubernetesarchitecture.md
         - Labels, Selectors, and Replication Controllers: devops/kube2.md
         - Jobs, init container and pod lifecycle: devops/kube3.md
