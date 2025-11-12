@@ -105,6 +105,7 @@ nav:
         - Salting: spark/salting.md
         - Best practices to design Spark application: spark/bp.md
       - Mongo: sql/Mongo.md
+      - Delta Lake: delta/deltalake.md
   - DevOps:
       - Git: devops/git.md
       - Docker: devops/docker.md

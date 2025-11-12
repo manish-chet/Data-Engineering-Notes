@@ -15,6 +15,15 @@ A software which allows users to interact with data. Stores data in structured f
 ## **Acid Properties**
 ![Acid Properties](acid.svg)
 
+Atomicity enforces the "all or nothing" principle, ensuring that an entire transaction either completes successfully or is rolled back, preventing partial, inconsistent states. For example, in a financial transfer, if a crash occurs after deducting funds from one account but before adding them to another, an atomic system would detect the failure before the final COMMIT and roll back the entire transaction. 
+
+Consistency guarantees that a transaction moves the database from one valid state to another, enforcing rules (like checking for sufficient funds) to prevent inconsistent results. 
+
+Isolation is the "no interference policy," meaning multiple concurrent transactions operate independently without seeing each other's uncommitted changes; Delta achieves this using 
+Optimistic Concurrency Control (OCC). 
+
+Durability ensures that once a transaction is committed, it permanently remains recorded in the system, even in the event of crashes or power outages. This is achieved by logging the start of the operation and the final COMMIT status in a transaction log (ledger); if the system restarts and the log shows no COMMIT, the changes are rolled back
+
 ---
 ## **SQL Data Types**
 
