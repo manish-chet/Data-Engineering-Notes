@@ -1,0 +1,4209 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for Data Engineering and Big Data Technologies">
+      
+      
+        <meta name="author" content="Manishkumar Chetpalli">
+      
+      
+      
+        <link rel="prev" href="../../sql/Mongo/">
+      
+      
+        <link rel="next" href="../../devops/git/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/sqldeveloper-original.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Delta Lake - Data Engineering Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#data-lake-problems-and-the-delta-lake-solution" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Data Engineering Notes" class="md-header__button md-logo" aria-label="Data Engineering Notes" data-md-component="logo">
+      
+  <img src="../../assets/images/sqldeveloper-original.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Data Engineering Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Delta Lake
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="light-green"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/manish-chet" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    DataEngineering
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../DataEngineering/DE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Fundamentals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../hadoop/Bigdata/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  BigData
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../devops/git/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  DevOps
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cloud/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Cloud computing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../hadoop/hadoopiq/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Interview Prep
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../about/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  About Me
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Data Engineering Notes" class="md-nav__button md-logo" aria-label="Data Engineering Notes" data-md-component="logo">
+      
+  <img src="../../assets/images/sqldeveloper-original.svg" alt="logo">
+
+    </a>
+    Data Engineering Notes
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/manish-chet" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    DataEngineering
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fundamentals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Fundamentals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/DE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/DEcycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Engineering Lifecycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/DEundercurrent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Engineering UnderCurrents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/DesigningGDA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Architecture & Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../airflow/dataorchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DataEngineering/fileformat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File Formats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/sql/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BigData
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    BigData
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/Bigdata/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/HDFS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HDFS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/mapreduce/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MapReduce
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/yarn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YARN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/kerberos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kerberos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Hive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hive/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hive/serde/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SerDe
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hive/partition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Partitioning & bucketing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hive/join/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Joins
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kafka
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Kafka
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/zookeeper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Role of Zookeeper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/partition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Partitions & Replciations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/offsets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Offsets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/logsegments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Log segments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/producer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Producers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/failures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Handling Producer Failures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/consumer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Consumers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/time/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index & Timeindex
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/trade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unclean Leader Election & Availability vs Durability Trade-Off
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ignite/ignite/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ignite
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../airflow/airflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Airflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spark
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Spark
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview & Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/sparktrans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DAG, Transformations & Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/sparksqlengine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SparkQuery Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/Rdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resilient Distributed Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SparkSession vs SparkContext
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/repart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repartition vs Coalesce
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/sparkmemory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Memory management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/sparksubmit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spark-Submit & Deployment modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/adaptive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adaptive Query Execution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/cacheandpersist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Caching & Persist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/dynamic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dynamic resource allocation & partition pruning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/salting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Salting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spark/bp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Best practices to design Spark application
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/Mongo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mongo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Delta Lake
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Delta Lake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-lake-problems-and-the-delta-lake-solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Lake Problems and the Delta Lake Solution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delta-log-internals-and-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delta Log Internals and Scaling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pessimistic-concurrency-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pessimistic concurrency control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimistic-concurrency-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimistic concurrency control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#time-travel-versioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time Travel &amp; Versioning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schema-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schema Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schema-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schema Evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parquet-to-delta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parquet to delta
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-on-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copy on Write
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#merge-on-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Merge on Read
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deletion-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deletion Vectors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shallow-vs-deep-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shallow v/s Deep Clone
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ctas-vs-deep-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CTAS vs Deep Clone
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#small-file-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Small File Problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimize-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimize Write
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vacuum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vacuum
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#z-ordering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z-ordering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#liquid-clustering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Liquid Clustering
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevOps
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    DevOps
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Git
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kubernetes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Kubernetes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kubernetesarchitecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kubernetesarchitecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Labels, Selectors, and Replication Controllers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jobs, init container and pod lifecycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploying object
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Persistent Volumes & Liveness Probes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Namespaces & Resource Quotas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devops/kube8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Horizontal Pod Autoscaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud computing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Cloud computing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Databricks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/databricks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interview Prep
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Interview Prep
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/hadoopiq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hadoop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hadoop/hadoopscenarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hadoop Scenario based
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/iq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kafka
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../airflow/airflowiq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Airflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../flink/iq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flink
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sql/mongoiq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MongoDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Me
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-lake-problems-and-the-delta-lake-solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Lake Problems and the Delta Lake Solution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delta-log-internals-and-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delta Log Internals and Scaling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pessimistic-concurrency-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pessimistic concurrency control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimistic-concurrency-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimistic concurrency control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#time-travel-versioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time Travel &amp; Versioning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schema-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schema Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schema-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schema Evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parquet-to-delta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parquet to delta
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-on-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copy on Write
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#merge-on-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Merge on Read
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deletion-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deletion Vectors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shallow-vs-deep-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shallow v/s Deep Clone
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ctas-vs-deep-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CTAS vs Deep Clone
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#small-file-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Small File Problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimize-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimize Write
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vacuum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vacuum
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#z-ordering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z-ordering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#liquid-clustering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Liquid Clustering
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../hadoop/Bigdata/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    BigData
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Delta Lake</h1>
+
+<h3 id="data-lake-problems-and-the-delta-lake-solution"><strong>Data Lake Problems and the Delta Lake Solution</strong><a class="headerlink" href="#data-lake-problems-and-the-delta-lake-solution" title="Permanent link">#</a></h3>
+<p>Data lakes offered flexible data storage, allowing ingestion of structured, semi-structured, and unstructured data like audio, video, images, or logs, and storing this high volume data cheaply and scalably on services like S3 or ADLS.</p>
+<p>However, data lakes presented severe challenges that Delta Lake was designed to solve, including a lack of ACID support, lack of support for update, merge, and delete operations, and issues related to data reliability and quality due to the absence of schema enforcement.</p>
+<p>Traditional updates or deletes required reading all the data into memory, applying the changes, and writing it back; if the system failed during this process, it resulted in inconsistent or corrupt data. Delta Lake addresses these issues and provides additional features such as time travel, unified batch and streaming capabilities, schema evolution and enforcement, and audit history</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="delta-log-internals-and-scaling"><strong>Delta Log Internals and Scaling</strong><a class="headerlink" href="#delta-log-internals-and-scaling" title="Permanent link">#</a></h3>
+<p>The Delta Log acts as the transaction layer on top of Parquet files, recording transactions atomically in JSON files (e.g., 0.json, 1.json). The current state of the table is calculated by "summing" all transaction logs, applying additions and removals to determine the set of active Parquet files. </p>
+<p><img alt="DeltaLog" src="../delta.svg" /></p>
+<p>Delta Lake computes the latest state of a table by reading the Delta Log and performing a summation of all recorded transactions. This approach ensures data consistency and provides features like time travel.</p>
+<p><strong>Core Components of a Delta Table</strong></p>
+<p>A Delta Lake table is composed of two main elements</p>
+<ol>
+<li>Data Files (Parquet): The actual data is stored in immutable Parquet files.</li>
+<li>Transaction Layer (Delta Log): A transaction layer, called the Delta Log, resides on top of the data files. This log records every operation performed on the table.</li>
+</ol>
+<p><strong>The Delta Log and Transaction Recording</strong></p>
+<p>Each transaction or operation (such as an insert, update, or delete) on a Delta table is treated as an atomic unit of work.</p>
+<p>Recording Transactions: Transactions are recorded as sequential JSON files (e.g., 0.json, 1.json, 2.json) within the hidden _delta_log folder.</p>
+<p>Operation Details: Each JSON file contains details about the operation performed (e.g., create or replace table, write, update, delete) and tracks which Parquet files were added or logically removed. A transaction groups one or more operations together. The commit info section contains details about the operation and the user who performed it. The add section notes a new Parquet file that was added to the table state. The remove section logically marks a Parquet file as no longer part of the current table state (a soft delete).</p>
+<p><strong>Computing the Latest State via Summation</strong></p>
+<p><img alt="DeltaLog" src="../delta2.svg" /></p>
+<p>When a user executes a query (e.g., SELECT * FROM table), Delta Lake processes the Delta Log to construct the latest valid view of the data:</p>
+<ol>
+<li>
+<p>Applying Transactions in Order: Delta Lake starts from the beginning of the transaction history and sequentially applies each transaction record (JSON file).</p>
+</li>
+<li>
+<p>Summation Principle: The system performs a "summation" of the transactions. It tracks all file additions (+) and removals (-). Files that are added and subsequently removed in later transactions cancel each other out.</p>
+</li>
+<li>
+<p>Handling Updates and Deletes: When an update or delete occurs, the original Parquet file containing the modified data is logically marked as REMOVE, and a new file (or files) containing the revised records is ADDed. For small changes, especially when deletion vectors are enabled, Delta Lake records the changes in the deletion vector file instead of rewriting the entire Parquet file immediately (Merge on Read approach). However, the log still records the necessary file additions and removals to reflect the logical state change.</p>
+</li>
+<li>
+<p>Final State Construction: The final, latest state of the table is computed by reading only the Parquet files that remain after all logical removals have been processed in the summation.</p>
+</li>
+</ol>
+<p><strong>Scaling the Delta Log (Compacted JSONs and Checkpoints)</strong></p>
+<p>For tables with millions of transactions, reading every JSON file in the Delta Log to compute the latest state would be computationally expensive and slow. </p>
+<p>To optimize this, Delta Lake uses two key scaling mechanisms:</p>
+<ol>
+<li>
+<p>Compacted JSONs: Compacted JSON files are used to reduce the overhead associated with reading many small JSON transaction files. Delta Lake periodically creates a compacted JSON file (e.g., a .compacted.json file). This compacted file picks up and dumps all the information (transactions and details) contained within a set of smaller JSON log files into one larger file, avoiding the need to open and close many individual files. If a transaction is committed, Delta can read the already compacted file plus any subsequent uncompacted files to compute the latest state. It avoids having to read all the historical individual JSON files.</p>
+</li>
+<li>
+<p>Checkpoint Parquet Files: Checkpoint files provide a mechanism to drastically reduce the number of files Delta must scan to determine the latest state of a table, offering a "tremendous amount of optimization". After a predetermined number of JSON files are created (e.g., 36 files in the Databricks environment used in the example), a checkpoint.parquet file is generated. This checkpoint file condenses all the information from the very first transaction (version zero) up to the point of the checkpoint.</p>
+</li>
+</ol>
+<p>To compute the latest state of the table, Delta only needs to find and read the latest checkpoint.parquet file and then apply any subsequent JSON files (or compacted JSONs) that have been created since that checkpoint. This allows Delta to skip reading potentially hundreds or thousands of older historical JSON log files. The gap at which a checkpoint file is created varies; it is 36 transactions in the Databricks version shown, but often 10 in the open-source version. This difference is due to Databricks implementing performance optimizations to relax this gap.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="pessimistic-concurrency-control"><strong>Pessimistic concurrency control</strong><a class="headerlink" href="#pessimistic-concurrency-control" title="Permanent link">#</a></h3>
+<p><strong>Core Assumption</strong></p>
+<p>PCC gets its name because the DBMS operates under the assumption that conflicts are bound to happen and are likely to occur. A conflict occurs when two or more transactions attempt to modify the same data simultaneously, resulting in an invalid state.
+It is a strategy used by database management systems (DBMS) to ensure that transactions maintain the correctness and consistency of the database.</p>
+<p><strong>Mechanism: Exclusive Locking</strong></p>
+<p>To prevent these conflicts, PCC uses a locking mechanism:</p>
+<p>• When a transaction attempts to make a change to a database, an exclusive lock is placed on that data.</p>
+<p>• This lock ensures that no other transaction can come in and make changes while the first transaction is running.</p>
+<p><img alt="DeltaLog" src="../delta4.svg" /></p>
+<p><strong>Example Walkthrough (T1 and T2)</strong></p>
+<p>Consider an account with a starting balance of $1,000, and two simultaneous transactions: T1 (withdraw $100) and T2 (deposit $400).</p>
+<ol>
+<li>T1 Starts: Transaction T1 begins first.</li>
+<li>Lock Acquired: The moment T1 starts, it acquires an exclusive lock on the relevant row (the account balance).</li>
+<li>T2 Waits: Because T1 holds the lock, T2 cannot proceed and must wait until T1 completes.</li>
+<li>T1 Processing: T1 reads the balance ($1,000), subtracts $100, and computes the new balance as $900.</li>
+<li>T1 Updates and Releases: T1 updates the account balance to $900 and then releases the exclusive lock.</li>
+<li>T2 Starts: T2 now gets a chance and places its own exclusive lock on the row.</li>
+<li>T2 Processing: T2 reads the latest balance ($900), adds $400, computes the final balance as $1,300, and updates the account.</li>
+<li>Consistency Achieved: T2 then releases its lock, and the database is left in the correct state.</li>
+</ol>
+<p><strong>Major Drawback</strong></p>
+<p>While PCC achieves consistency, its major downside is performance when dealing with high concurrency:</p>
+<p>• Waiting: T2 had to wait until T1 was completed.</p>
+<p>• Scalability Issue: If a system handles millions of transactions, the waiting involved means the entire system is going to "come to a halt" because transactions wait endlessly for locks to be released, making the system slow and inefficient.
+This performance issue is why Delta Lake primarily achieves isolation using Optimistic Concurrency Control (OCC), which assumes conflicts are rare and avoids explicit locks</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="optimistic-concurrency-control"><strong>Optimistic concurrency control</strong><a class="headerlink" href="#optimistic-concurrency-control" title="Permanent link">#</a></h3>
+<p><strong>Core Assumption (Optimism)</strong></p>
+<p>The name "Optimistic" comes from its fundamental assumption: conflicts are very unlikely to occur. Conflicts, where two or more transactions try to modify the same data and lead to an invalid state, are assumed to be rare. This assumption allows the system to prioritize speed and concurrency over preemptive conflict avoidance.</p>
+<p><strong>Mechanism: Avoiding Locks</strong></p>
+<p>With OCC, transactions do not obtain locks when they read or write data. This is the "beautiful part" of OCC. Because no locks are used, multiple transactions can read the same row simultaneously.</p>
+<p>When transactions (like T1 and T2) begin, they read the account balance, and crucially, they also read the associated version number and time frame of the data. This version number tracks changes within the table.</p>
+<p><strong>Conflict Resolution and Validation</strong></p>
+<p><img alt="DeltaLog" src="../delta5.svg" /></p>
+<p>When transactions are finished processing and attempt to commit their changes, a validation procedure occurs:</p>
+<ol>
+<li>Concurrent Execution: T1 and T2 perform their calculations independently (e.g., T1 computes $900, T2 computes $1,400).</li>
+<li>First Commit Wins (T1): T1 attempts to commit first. It checks the current version number (let's say V1) against the version number it read (also V1). Since they match, T1 knows no one made changes while it was working. T1 succeeds, updates the balance (to $900), and updates the version number (to V2).</li>
+<li>Second Commit Fails (T2): T2 attempts to commit next. It checks the current version number (now V2) against the version it originally read (V1). Because V2=V1, T2 immediately understands that a person came before it and made changes to the table. T2 was working on stale data.</li>
+<li>The Retry: The conflicting transaction (T2) does not block; instead, it is designed to fail. It must then retry the transaction. It reads the latest state of the table (V2), re-applies its operation (adding $400 to 900),computesthecorrectfinalbalance(1,300), and attempts to commit again.</li>
+<li>Successful Second Attempt: T2 checks the version again (V2 = V2), finds it is working on the latest data, and updates the table (to $1,300) and the version number (to V3).</li>
+</ol>
+<p><strong>High Concurrency Benefits</strong></p>
+<p>This approach has significant advantages for modern data systems:</p>
+<p>• No Interference: Multiple simultaneous transactions can proceed "without interfering with each other". Each transaction operates as if it is the only one running. Intermediate or uncommitted changes are not visible to other transactions.</p>
+<p>• High Concurrency: This mechanism allows for a very high level of concurrency, as transactions avoid endless waiting caused by locks.</p>
+<p>• Suitability for Read-Heavy Systems: OCC works best in systems where writes (and therefore conflicts) happen very rarely.
+This efficient conflict resolution is why OCC, and the versioning ledger it relies on, is central to Delta Lake’s architecture.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="time-travel-versioning"><strong>Time Travel &amp; Versioning</strong><a class="headerlink" href="#time-travel-versioning" title="Permanent link">#</a></h3>
+<p><strong>Versioning</strong></p>
+<p>It is the mechanism that helps Delta Lake track the different states of a table over time.</p>
+<p>• Tracking Changes: Every operation performed on a Delta table (such as a create, delete, update, or insert) results in the creation of a new version of the table.</p>
+<p>• Zero-Indexed: The first operation performed (like a CREATE OR REPLACE TABLE AS SELECT) creates version zero of the table. Subsequent operations increment this version number. For example, after version zero, a delete operation might create version one, an update might create version two, and a write (insert) might create version three.</p>
+<p>• Audit History: This version history allows users to see an audit trail of operations performed, including the timestamp, the user who performed the operation, and the operation details.</p>
+<p><strong>Time Travel (Accessing Past States)</strong></p>
+<p>Time travel is the ability to query or restore a Delta table to any of its previous versions. This is a core feature for data reliability, testing, and compliance.</p>
+<p>• Accessing Specific Versions: Users can select data from a specific historical version using either the version number or the timestamp of that version.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Using Version Number</strong>: You can use the syntax VERSION AS OF [version_number] </p>
+<p>In a SELECT query (e.g., SELECT * FROM table VERSION AS OF 0).</p>
+<p><strong>Using Timestamp</strong>: You can use the syntax TIMESTAMP AS OF [timestamp] in a SELECT query. The timestamp must be a time at which a version existed.</p>
+</div>
+<p>• Handling Non-Exact Timestamps: If a user specifies a timestamp that doesn't exactly match a version's commit time, Delta Lake finds the latest version that existed before that specified time. For instance, if versions existed at 9:31 and 9:57, querying for 9:35 will return the state of version 9:31.</p>
+<p>• Restoring the Table: Beyond querying, a user can permanently roll the table back to a specific version using the RESTORE TABLE command (e.g., RESTORE TABLE [table_name] TO VERSION AS OF 0). This restoration itself is recorded as a new version in the table's history.</p>
+<p><strong>Impact of Vacuum on Time Travel</strong></p>
+<p>It is crucial to understand that the VACUUM command limits time travel capability.</p>
+<p>• File Deletion: When you run VACUUM, especially with a retention duration of zero, Delta Lake permanently deletes the physical data files that are no longer referenced by the current version (i.e., files that have been "tombstoned" or marked for soft delete by update/delete operations).</p>
+<p>• Version Incompleteness: If a file required to construct an older version is removed by a VACUUM operation, time travel back to that specific version will fail because the data required to fully reconstruct that historical state is incomplete or missing.</p>
+<p>For instance, in a demonstration, attempting to access version one of a table after a vacuum failed because the file written in version one was deleted, but accessing version zero worked because its necessary file was still present</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="schema-validation"><strong>Schema Validation</strong><a class="headerlink" href="#schema-validation" title="Permanent link">#</a></h3>
+<p><img alt="DeltaLog" src="../delta6.svg" /></p>
+<p><strong>Schema-on-Read (Traditional Data Lakes)</strong></p>
+<p>The traditional approach used in standard data lakes is schema-on-read.</p>
+<p>Data is dumped into the lake in any format (structured, semi-structured, unstructured) and resides there. The application of the schema happens later, <em>after</em> the data has been stored, typically when a user runs a query to read the files.</p>
+<p>This flexibility leads to inconsistency. If different files are ingested with varying formats or column structures, writing a query becomes difficult, requiring complex logic to handle different fields and schemas.</p>
+<p><strong>Schema-on-Write (Delta Lake Validation)</strong></p>
+<p>Delta Lake uses a schema-on-write approach, which is essential for ensuring that every transaction brings the database from one valid state to another.</p>
+<p>Incoming data records are checked to validate their schema against the target Delta table's existing schema before ingestion occurs. This is done to prevent "garbage data" from corrupting the table.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Scenario</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">INSERT Behavior</th>
+<th style="text-align: left;">MERGE Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1. Column Order</td>
+<td style="text-align: left;">The source data columns are reordered relative to the target table.</td>
+<td style="text-align: left;">Matches columns by position. If data types are compatible, data corruption occurs as values are mapped incorrectly.</td>
+<td style="text-align: left;">Matches columns by name. It correctly identifies columns even if the physical order is changed.</td>
+</tr>
+<tr>
+<td style="text-align: left;">2. Data Type</td>
+<td style="text-align: left;">Incoming data types do not match the target schema's definitions.</td>
+<td style="text-align: left;">Attempts to cast (convert) the incoming value to the table's data type (e.g., string '99499' to an integer). Fails if the string value cannot be cast (e.g., 'ABC' to integer), preventing data garbage.</td>
+<td style="text-align: left;">Similar automatic casting attempts are made.</td>
+</tr>
+<tr>
+<td style="text-align: left;">3. Column Name</td>
+<td style="text-align: left;">Source data column names differ from the target table column names.</td>
+<td style="text-align: left;">Ignores name differences, as it matches columns by position. The write succeeds if positions align.</td>
+<td style="text-align: left;">Is strictly based on matching column names. If names are mismatched, the operation fails because it cannot resolve the column.</td>
+</tr>
+<tr>
+<td style="text-align: left;">4. Nullability/Constraints</td>
+<td style="text-align: left;">The incoming data violates constraints (e.g., <code>NOT NULL</code> for a primary key).</td>
+<td style="text-align: left;">Fails if a <code>NOT NULL</code> constraint is violated by inserting a <code>NULL</code>. Applies to other rules like ensuring <code>price</code> is greater than zero.</td>
+<td style="text-align: left;">Fails if constraints are violated.</td>
+</tr>
+<tr>
+<td style="text-align: left;">5. Extra Columns</td>
+<td style="text-align: left;">The source data contains more columns than the target table schema.</td>
+<td style="text-align: left;">Fails with a "schema mishmash detected" error.</td>
+<td style="text-align: left;">Is robust; it successfully inserts the data by focusing only on the columns defined in the target schema, ignoring the extra columns.</td>
+</tr>
+</tbody>
+</table>
+<p>Since schema validation is critical for ensuring consistency and preventing corruption, the choice between <code>INSERT</code> and <code>MERGE</code> is often determined by how robustly you need to handle potential schema changes.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="schema-evolution"><strong>Schema Evolution</strong><a class="headerlink" href="#schema-evolution" title="Permanent link">#</a></h3>
+<p>Schema evolution is Delta Lake's capability to handle changes to a table's schema, such as adding, reordering, or modifying columns, without having to completely rewrite the underlying table or data. This functionality is crucial for maintaining flexibility in data pipelines.</p>
+<p>The ability to evolve a schema accommodates several common changes:</p>
+<ol>
+<li>Adding new columns.</li>
+<li>Upgrading a data type to a larger, more accommodating type (type widening).</li>
+<li>Handling changes within nested structures.</li>
+<li>Changing the physical position of columns.</li>
+</ol>
+<p><strong>Adding New Columns (Scenario 1)</strong></p>
+<p>New columns can be added using two main approaches:</p>
+<p>Manual Approach (<code>ALTER TABLE ADD COLUMN</code>): The user explicitly runs the <code>ALTER TABLE ADD COLUMN</code> statement to update the table's schema. Subsequent <code>INSERT</code> or <code>WRITE</code> operations that include this new column will succeed. Rows that existed before the new column was added will contain <code>NULL</code> values for that column.</p>
+<p>Automatic Schema Evolution: This approach is enabled by setting a specific table property to <code>true</code>. If the incoming data contains a new column that does not exist in the target Delta table, the system automatically accommodates it without requiring a manual <code>ALTER</code> statement.</p>
+<p><strong>Type Widening (Scenario 2)</strong></p>
+<p>Type widening refers to the ability to upgrade a data type to a "bigger type" to handle larger values, such as converting an <code>INT</code> to a <code>BIGINT</code> or a <code>FLOAT</code> to a <code>DOUBLE</code>.</p>
+<p>Enforcement: This capability was introduced in Delta version 3.2 (which corresponds to Databricks Runtime 15.4 used in the demonstration).</p>
+<p>Manual Change Required: Even with automatic schema evolution enabled, type widening often does not happen automatically. If an incoming value exceeds the capacity of the current column type (e.g., a huge number for an <code>INT</code> column), the system fails with an error. The user must manually run an <code>ALTER COLUMN</code> statement to change the type (e.g., <code>ALTER COLUMN customer ID TYPE BIGINT</code>) before the write will succeed.</p>
+<p><strong>Nested Structure Evolution (Scenario 3)</strong></p>
+<p>Delta Lake supports schema changes within nested <code>STRUCT</code> data types.</p>
+<p>Adding Attributes: You can add a new attribute to an existing <code>STRUCT</code> column using <code>ALTER TABLE ADD COLUMN</code> with the dot notation (e.g., <code>ALTER TABLE... ADD COLUMN purchase_details.store_location STRING</code>).</p>
+<p>Changing Nested Types: You can also manually change the data type of an attribute inside a <code>STRUCT</code> (e.g., changing <code>mall_pin_code</code> from <code>INT</code> to <code>BIGINT</code>) using <code>ALTER COLUMN purchase_details.mall_pin_code TYPE BIGINT</code>.</p>
+<p>Automatic Nested Evolution: To automatically add a new attribute to a nested <code>STRUCT</code> during an insert, the user must utilize a named struct. This is necessary because if a simple positional insert is used, the system won't know the key of the new attribute, leading to inconsistencies.</p>
+<p><strong>Column Position Changes (Scenario 4)</strong></p>
+<p>Delta Lake provides methods to control the physical placement of columns:</p>
+<p>Manual Positioning: When manually adding a column, you can specify its exact location using <code>FIRST</code> (to place it as the first column) or <code>AFTER [column_name]</code> (to place it after a specific column).</p>
+<p>Automatic Behavior: When automatic schema evolution is enabled (especially with a <code>MERGE</code> operation), if a new column is encountered in the source, Delta Lake generally appends that column as the last column in the table, even if the user intended a different position.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="parquet-to-delta"><strong>Parquet to delta</strong><a class="headerlink" href="#parquet-to-delta" title="Permanent link">#</a></h3>
+<p>Converting an existing Parquet file (or a folder containing Parquet files) into a Delta Lake table format is necessary to enable features like ACID transactions, time travel, and schema enforcement.</p>
+<p>The fundamental difference between a standard Parquet file and a Delta table is the presence of the transaction layer, or the Delta Log. When a directory contains Parquet data but no Delta Log folder, it is not yet a Delta table.</p>
+<p>The conversion process essentially creates this transactional layer and registers the existing data. There are two primary methods detailed in the video for converting Parquet to Delta:</p>
+<p><strong>Using SQL / Shell Command</strong></p>
+<p>The first method involves using the <code>CONVERT TO DELTA</code> command directly on the path of the Parquet data.</p>
+<p>This approach is straightforward and typically executed using Spark SQL or a shell command that interacts with the Delta Lake framework.When executed, this command instructs Delta Lake to perform the conversion.</p>
+<p><strong>Using the Delta Table API</strong></p>
+<p>The second method utilizes the Delta Lake API, typically within a Python or Scala environment, using the <code>DeltaTable</code> class.</p>
+<p>This requires importing the necessary library (e.g., <code>from delta.tables import DeltaTable</code>). The function used is <code>convertToDelta</code>. For example: <code>DeltaTable.convertToDelta(path, format='parquet')</code>.</p>
+<p><strong>The Core Conversion Mechanism</strong></p>
+<p>Regardless of the method used, the underlying process to transform the Parquet files into a Delta table is the same:</p>
+<ol>
+<li>Delta Log Creation: A new folder named <code>_delta_log</code> is created in the directory containing the Parquet files.</li>
+<li>Transaction Registration: The Delta Log is populated with its first transaction file, a JSON file (version <code>0.json</code>), which records the initial operation.</li>
+<li>Data Registration (The <code>ADD</code> Operation): This initial JSON file contains an ADD operation, which explicitly registers the existing Parquet file(s) as the contents of the newly created Delta table. This transaction registers the data.</li>
+</ol>
+<p>Once this transaction is recorded, the folder structure officially functions as a Delta Lake table.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="copy-on-write"><strong>Copy on Write</strong><a class="headerlink" href="#copy-on-write" title="Permanent link">#</a></h3>
+<p>Copy on Write is defined by the underlying architecture of data storage in Delta Lake: Parquet files.</p>
+<p>Immutable Files: Parquet files are immutable, meaning they cannot be modified directly once they are written to disk.</p>
+<p><img alt="DeltaLog" src="../delta7.svg" /></p>
+<p><strong>The Copy on Write Mechanism</strong></p>
+<p>Since files cannot be changed directly, any operation that modifies the data must result in new files being created. Delta Lake follows the Copy on Write approach when deletion vectors are disabled.</p>
+<p>The mechanism involves three steps for any change (update, delete, or merge):</p>
+<ol>
+<li>Read: The system must read the entire existing Parquet file that contains the record(s) intended for modification.</li>
+<li>Apply Operation: The necessary changes (delete or update) are applied in memory.</li>
+<li>Rewrite: The entire file is then rewritten back to storage as a completely new file, either omitting the deleted records or including the updated records.</li>
+</ol>
+<p>For instance, to delete rows 1 and 6 from a file named <code>1.parquet</code>, Copy on Write rewrites the whole file into a new file (e.g., <code>2.parquet</code>) which omits those two rows. This new file (<code>2.parquet</code>) is then the one referenced for the latest version of the data.</p>
+<p><strong>Computational Expense (The Drawback)</strong></p>
+<p>The Copy on Write approach has a significant drawback: it is "tremendously computationally expensive".</p>
+<p>Costly Rewriting: The read and rewrite process is very costly. If a Parquet file contains 10 million rows and you only need to delete a "few couple of rows," you still must read the whole file and rewrite the whole file back.</p>
+<p><strong>Optimal Use Case</strong></p>
+<p>Because Copy on Write involves expensive rewrites for frequent changes, it is not ideal for high-write scenarios.</p>
+<p>Read-Heavy Focus: CoW works best for use cases that are read heavy and where the frequency of writes (updates, deletes) is very low. If rights are high, the system will read and rewrite the whole file repeatedly, making the system slow.</p>
+<p>Copy on Write's performance limitations during frequent writes is the reason Delta Lake later introduced Deletion Vectors to enable the Merge on Read paradigm, which avoids these costly full file rewrites.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="merge-on-read"><strong>Merge on Read</strong><a class="headerlink" href="#merge-on-read" title="Permanent link">#</a></h3>
+<p>Merge on Read (MoR) is a critical concurrency paradigm in Delta Lake that is enabled when deletion vectors are turned on. It provides a high-performance alternative to the traditional Copy on Write approach.</p>
+<p><img alt="DeltaLog" src="../delta8.svg" /></p>
+<ol>
+<li>The Core Problem Solved by MoR</li>
+</ol>
+<p>The fundamental challenge in data systems using immutable files (like Parquet, which Delta Lake uses under the hood) is how to handle updates and deletes efficiently. In the Copy on Write approach, any change requires reading the entire affected file, applying the change, and then rewriting the entire file back to storage. This rewrite process is "tremendously computationally expensive," even if only a "few couple of rows" are modified in a file containing millions of records.</p>
+<ol>
+<li>The Mechanism: Deletion Vectors</li>
+</ol>
+<p>Merge on Read resolves this expensive rewrite problem by keeping the original Parquet files untouched.</p>
+<p>Recording Changes: Instead of modifying the data file, any changes (such as deletions) are recorded in a separate, much smaller file known as a deletion vector (DV).
+   DV Content: The deletion vector records the row number or index of the records that are intended for deletion.
+   Updates as Two Operations: An update operation is logically treated as a "delete plus insert". The old row is marked for deletion in the DV, and the newly updated row is written as a small, new Parquet file.</p>
+<ol>
+<li>The Read Process (The "Merge" Step)</li>
+</ol>
+<p>When a user runs a query to read the latest state of the table, the system uses the Merge on Read approach to combine the data:</p>
+<ol>
+<li>Read Files: The system reads the underlying Parquet file(s).</li>
+<li>Check DV: For each row read from the Parquet file, the system checks the deletion vector.</li>
+<li>Soft Delete: If the row's index is present in the DV, that row is treated as a soft delete and is skipped from the final output. If the row is not present in the DV, it is displayed.</li>
+<li>
+<p>Final State: The result is the latest state of the table, which is constructed from the original file combined with the information in the small DV bitmap file.</p>
+</li>
+<li>
+<p>Benefits and Optimal Use</p>
+</li>
+</ol>
+<p>Deletion vectors, and thus Merge on Read, bring significant performance advantages:</p>
+<p>Increased Write Performance: MoR avoids the costly process of rewriting the entire Parquet file for small changes. This dramatically reduces write latency.
+   Efficiency: It increases the performance of deletes, updates, and merge operations.
+   Best Use Case: MoR works best for use cases where data is updated frequently.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="deletion-vectors"><strong>Deletion Vectors</strong><a class="headerlink" href="#deletion-vectors" title="Permanent link">#</a></h3>
+<p><strong>The Problem Deletion Vectors Solve</strong></p>
+<p>Underlying Delta Lake, data is stored in Parquet files, which are immutable.</p>
+<p>In the traditional approach, known as Copy on Write: if you want to update or delete just one record in a Parquet file containing millions of rows, the system must:</p>
+<ol>
+<li>Read the entire Parquet file.</li>
+<li>Apply the update or delete operation.</li>
+<li>Rewrite the entire file back, omitting the deleted row or including the updated row.</li>
+</ol>
+<p>This read-and-rewrite process is computationally expensive and is the bottleneck that deletion vectors aim to resolve.</p>
+<p><strong>The Solution: Merge on Read and Deletion Vectors</strong></p>
+<p>Deletion vectors enable Delta Lake to use the Merge on Read approach when they are enabled.</p>
+<p>Mechanism: Instead of rewriting the massive Parquet file, the original file remains untouched. The changes (deletions or updates) are recorded in a separate, small file called the deletion vector (DV).</p>
+<p>Content: The deletion vector acts as a bitmap, recording the row number or index of the records that are supposed to be removed or soft-deleted.</p>
+<p><strong>Operation with Deletion Vectors</strong></p>
+<p>When a transaction occurs, the transaction log is updated, often including the deletion vector:</p>
+<p>Delete Operation: A delete operation simply records the row numbers of the deleted records in the deletion vector file. For example, deleting row 1 and row 6 results in those numbers being recorded in the DV.
+   Update Operation: An update is treated as a "delete plus insert". When updating a row, the old version of the row is marked for deletion in the deletion vector, and the newly updated row is written as a new, small Parquet file.</p>
+<ol>
+<li>Reading the Data</li>
+</ol>
+<p>When a user reads the latest state of the table, the system checks both the Parquet data and the deletion vector:</p>
+<p>The system reads the Parquet file.
+   For each row read, it checks the deletion vector.
+   If the row's index is present in the DV, it is treated as a soft delete and is skipped from the final output, ensuring the file doesn't have to be rewritten for every minor change.</p>
+<ol>
+<li>Benefits and Tradeoffs</li>
+</ol>
+<p>Deletion vectors provide significant advantages:</p>
+<p>Performance: They reduce write latency by avoiding the rewriting of the whole file for small changes.
+   Efficiency: They bring Merge on Read capability to Delta Lake, increasing the performance of deletes, updates, and merge operations.</p>
+<p>However, the Merge on Read approach (with DVs enabled) works best for use cases where data is updated frequently. Conversely, the Copy on Write approach (DVs disabled) is generally better for read-heavy use cases.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="shallow-vs-deep-clone"><strong>Shallow v/s Deep Clone</strong><a class="headerlink" href="#shallow-vs-deep-clone" title="Permanent link">#</a></h3>
+<p>Cloning is a functionality in Delta Lake that allows you to create a snapshot of your Delta tables at a specific point in time [i, 148]. There are two main approaches or "flavors" to cloning: shallow clone and deep clone.</p>
+<p>Shallow Clone</p>
+<p><img alt="DeltaLog" src="../delta9.svg" /></p>
+<p>A shallow clone involves taking a snapshot primarily of the table's metadata at a specific point in time.</p>
+<p>Mechanism and Data Storage:
+   When a table is shallow cloned, Delta Lake does not copy the underlying data files (such as Parquet files).
+   Instead, the shallow clone table simply references the underlying data files of the source table.
+   The target shallow clone table will start with a fresh history, beginning at version zero.
+   The metadata itself is duplicated, but not via a one-to-one copy of the source JSON transaction files. All information in the source table's delta log is condensed into a <code>0.checkpoint.parquet</code> file, and the latest state of the source table is computed and recorded in <code>0.json</code> in the target table's delta log.</p>
+<p>Performance and Cost:
+   The shallow clone operation is super fast and computationally cheap.
+   It does not use a lot of storage because the data files are only referenced, not copied.</p>
+<p>Independence and Limitations:
+   Once a shallow clone is created, it maintains its own history and set of operations.
+   Any changes, updates, or modifications made to the shallow clone table will not affect the source table, and similarly, changes to the source table will not affect the shallow clone table.
+   You can clone a table using a specific timestamp or version number from the source table, using <code>VERSION AS OF</code> or <code>TIMESTAMP AS OF</code>.
+   Since the shallow clone starts with a fresh version zero representing the latest state of the source, you cannot access the full history of the source table (e.g., versions 1 or 2) through the shallow clone table.
+   If a <code>VACUUM</code> operation is run on the source table after a shallow clone has been created, any underlying data files that are still being referenced by the shallow clone will not be removed from the source storage until those references are deleted in the shallow clone(s) as well.</p>
+<p>Deep Clone (or Copy)</p>
+<p><img alt="DeltaLog" src="../delta10.svg" />
+A deep clone, or deep copy, creates a completely independent copy of both the metadata and the data files.</p>
+<p>Mechanism and Data Storage:
+   A deep clone performs an exact replication of the underlying Parquet files from the source to the target location.
+   The target deep clone table is self-contained and independent.
+   Similar to shallow clones, the metadata starts at version zero in the target table, with the source transaction history being condensed into a checkpoint file (<code>0.checkpoint.parquet</code>) and the latest state computed and placed in <code>0.json</code>.</p>
+<p>Performance and Cost:
+   This operation takes a little bit longer and uses more storage compared to a shallow clone, because it copies the data files instead of referencing them.</p>
+<p>Independence and Advantages:
+   The deep clone is fully independent: changes in the deep clone table will not affect the source table, and changes in the source table will not affect the deep cloned table.
+   Deep clone operations are incremental. If you perform a subsequent deep clone (e.g., for disaster recovery synchronization), it does not copy the entire source table again. Instead, it only copies or syncs the incremental changes (such as updates or deletes) that have occurred since the last clone, making the operation robust and performant.
+   Deep cloning is considered a more robust way to clone than using a <code>CREATE TABLE AS SELECT (CTAS)</code> statement. A CTAS statement only uses the resulting rows to create a new table, often losing table properties, constraints, and partitioning details. A deep clone, however, also clones the metadata and properties of the table.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Shallow Clone</th>
+<th style="text-align: left;">Deep Clone</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Data Files</td>
+<td style="text-align: left;">Referenced (not copied)</td>
+<td style="text-align: left;">Independent copy (copied one-to-one)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Metadata</td>
+<td style="text-align: left;">Copied/Replicated</td>
+<td style="text-align: left;">Copied/Replicated</td>
+</tr>
+<tr>
+<td style="text-align: left;">Speed</td>
+<td style="text-align: left;">Super fast</td>
+<td style="text-align: left;">Takes a little bit longer</td>
+</tr>
+<tr>
+<td style="text-align: left;">Storage Use</td>
+<td style="text-align: left;">Computationally cheap, low storage</td>
+<td style="text-align: left;">Uses more storage</td>
+</tr>
+<tr>
+<td style="text-align: left;">Independence</td>
+<td style="text-align: left;">Independent history/changes post-clone</td>
+<td style="text-align: left;">Completely self-contained and independent</td>
+</tr>
+</tbody>
+</table>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="ctas-vs-deep-clone"><strong>CTAS vs Deep Clone</strong><a class="headerlink" href="#ctas-vs-deep-clone" title="Permanent link">#</a></h3>
+<p>The distinction between creating a table using a <strong>CTAS (CREATE TABLE AS SELECT)</strong> statement and performing a <strong>Deep Clone</strong> lies primarily in how the metadata, properties, and incremental changes are handled.</p>
+<p>Output Similarity</p>
+<p>Initially, if you were to look at the resulting tables at the output level (for example, by running a <code>SELECT *</code> query), the table generated using CTAS and the table generated using a deep clone would look <strong>exactly identical</strong>. They both contain the same underlying rows of data.</p>
+<p>Key Differences (Metadata and Properties)</p>
+<p>The crucial difference is what information is carried over from the source table to the new table:</p>
+<ol>
+<li><strong>Handling of Properties:</strong> A <strong>CTAS statement</strong> creates a table <strong>just using the output of a select query</strong>. It takes the resulting set of rows and uses those rows to create the new table. Consequently, <strong>all of the properties are lost</strong> when using CTAS. These lost properties can include partitioning configurations and constraints.</li>
+<li><strong>Robustness of Deep Clone:</strong> Deep clone, conversely, is described as a <strong>robust way to clone the metadata, the data, and the properties of the table</strong>. When you perform a deep clone, you <strong>do not need to respecify</strong> things like partitioning properties and constraints, because they are automatically cloned along with the data.</li>
+</ol>
+<p>Incremental Feature (Deep Clone Advantage)</p>
+<p>Another significant advantage of deep clone over CTAS is its ability to operate incrementally:</p>
+<ul>
+<li><strong>Incremental Synchronization:</strong> Deep cloning is designed to work in an <strong>incremental manner</strong>. This capability is useful for scenarios like disaster recovery, where you need to maintain a synchronous replica of a source table.</li>
+<li><strong>Performance on Resync:</strong> If you perform a deep clone to create a replica initially, and then later run the deep clone again to bring the tables back in sync (after updates or deletes occurred on the source), Delta Lake <strong>does not copy the whole source table again</strong>. Instead, it <strong>only copies or syncs the incremental changes</strong> that have occurred since the last clone. This ensures that the operation is performant and robust because only the necessary operations (updates or deletes) are applied to the replica.</li>
+</ul>
+<p>In summary, while CTAS is good for creating a simple, static snapshot of the rows, Deep Clone is a more sophisticated mechanism that ensures the <strong>integrity of the table structure and settings</strong> (metadata and properties) is maintained, and it allows for <strong>efficient, incremental synchronization</strong>.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="small-file-problem"><strong>Small File Problem</strong><a class="headerlink" href="#small-file-problem" title="Permanent link">#</a></h3>
+<p>The small file problem is a phenomenon that silently kills your Spark performance. It occurs when data intended to be part of a large dataset is scattered over thousands of smaller files.</p>
+<p>What is the Small File Problem?</p>
+<p>The small file problem arises because, although the total volume of data might be reasonable, the large number of small files introduces immense overhead for the processing engine.</p>
+<p>The source uses the analogy of a 300-page novel: instead of being a single 300-page PDF, someone saves each of the 300 pages as a separate PDF. To read the novel, the system would have to perform thousands of time-consuming operations:</p>
+<ol>
+<li>Find/Look up the file.</li>
+<li>Open the file.</li>
+<li>Read the file.</li>
+<li>Close the file.</li>
+</ol>
+<p>When reading a table scattered across thousands of smaller files, the thousands of open, close, and metadata lookup operations lead to wasted compute and poor I/O.</p>
+<p>Root Causes of the Small File Problem</p>
+<p>The video identifies three primary root causes that lead to the creation of excessive small files:</p>
+<ol>
+<li>Repartitioning to a very large number: If you have a file that is 10 GB in size and you use <code>.repartition(10000)</code>, you will end up with 10,000 resulting files, each only about 1 megabyte in size. These undersized files cause the small file problem.</li>
+<li>Partitioning on a high cardinality column: When partitioning data (using <code>partitionBy</code>) on a column that has a large number of distinct values (high cardinality, e.g., thousands of distinct values in a category column), you create many separate folders, each containing very small amounts of data.</li>
+<li>Frequently updated data sets: Data streams that receive continuous updates, perhaps every 5 minutes, write small updates in small chunks. These small chunks manifest as small files, leading to the small file problem.</li>
+</ol>
+<p>Solution: The <code>OPTIMIZE</code> Command</p>
+<p>Delta Lake provides a built-in operation called <code>OPTIMIZE</code> to solve the small file problem.</p>
+<p>The <code>OPTIMIZE</code> command works by compacting all of these small files into larger, more appropriately sized ones.</p>
+<p>Bin Packing Algorithm</p>
+<p>The compaction relies on an algorithm known as bin packing. This algorithm works as follows:</p>
+<ol>
+<li>It collects all file sizes and sorts them from high to low.</li>
+<li>It then places each file into a "bin," where each bin represents a new, large consolidated file.</li>
+<li>The goal is to fill the bins up to a default target file size of 1 GB. This 1 GB target size is considered robust and should not be changed unless there is a compelling reason to do so.</li>
+</ol>
+<p>Post-Optimization Cleanup</p>
+<p>When <code>OPTIMIZE</code> is run, it creates the new, larger files but does not immediately remove the original small files.</p>
+<p>The small files that were compacted are tombstoned (marked for soft delete).
+   To physically remove the tombstoned files and recover storage space, you must run the <code>VACUUM</code> command.</p>
+<p>Incremental Compaction Approaches</p>
+<p>Beyond manual optimization, Delta Lake offers two automatic approaches to address small files generated during writes:</p>
+<ol>
+<li>Optimize Write: This feature combines all small writes intended for a partition into a single write command. It shuffles all the data and executes a single write command, which produces appropriately sized files for every partition. While effective for creating appropriate file sizes, it incurs a shuffle, which can be costly in terms of data transfer and right latency.</li>
+<li>Auto Compaction: This runs a compaction operation (similar to <code>OPTIMIZE</code>) automatically after a write finishes, if the number of small files exceeds a minimum threshold (the default minimum number of files to trigger auto compaction is 50, though this can be configured). This approach combines the small files into appropriately sized files.</li>
+</ol>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="optimize-write"><strong>Optimize Write</strong><a class="headerlink" href="#optimize-write" title="Permanent link">#</a></h3>
+<p>The feature Optimize Write is an automatic optimization technique used in Delta Lake, specifically designed to address one of the root causes of the small file problem.</p>
+<p>Here is a detailed explanation of how Optimize Write works and its implications, as described in the video:</p>
+<p>The Problem it Solves (Traditional Write)</p>
+<p>In a traditional write scenario, multiple processes or executors (e.g., Executor 1, 2, and 3) often try to write data concurrently to the same partition (for example, a date partition like <code>date=2025-05-01</code>). Since these writes happen simultaneously in small chunks, they result in the creation of many small Parquet files (e.g., <code>1.pk</code>, <code>2.pk</code>, <code>3.pk</code>) within that single partition folder. This proliferation of tiny files leads directly to the small file problem, which silently reduces Spark performance due to excessive file opening, closing, and metadata lookups.</p>
+<p>Mechanism of Optimize Write</p>
+<p>Optimize Write operates by transforming multiple intended small writes into a single, cohesive write operation.</p>
+<ol>
+<li>Data Shuffle: When Optimize Write is enabled, all data coming from different processes (Executor 1, 2, and 3) is first shuffled.</li>
+<li>Single Write Command: After the shuffle, the entire dataset intended for the partition is executed as a single write command.</li>
+</ol>
+<p>This process combines all the data together before it is physically written to the storage location.</p>
+<p>Outcome and Benefits</p>
+<p>The key benefit of using Optimize Write is that it produces appropriately sized files for every partition. By consolidating the output, it ensures that instead of scattering data across numerous small files, the data is packaged efficiently into large files (up to the target size, typically 1 GB), effectively avoiding the small file problem right at the source.</p>
+<p>Trade-offs and Costs</p>
+<p>While highly effective at preventing small files, Optimize Write introduces a notable trade-off:</p>
+<p>Shuffle Cost: The operation necessarily incurs a shuffle. Shuffles are costly because they involve data transfer across the network.
+   Write Latency: If your primary concern is optimizing for write latency (the time it takes for data to be written and become available), Optimize Write might not be the best solution because the involved shuffle will add time to the overall writing process.</p>
+<p>Therefore, Optimize Write is generally viewed as a very good solution for optimizing for the small file problem, but users must consider the added shuffle overhead. The source demonstrated this, showing that a query operation ran much quicker (1.82 seconds) on a table created with Optimize Write compared to a table created using traditional, small-file-generating methods (6.97 seconds).</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="vacuum"><strong>Vacuum</strong><a class="headerlink" href="#vacuum" title="Permanent link">#</a></h3>
+<p>The <code>VACUUM</code> command in Delta Lake is a crucial optimization technique used for managing the physical storage of data files associated with a Delta table.</p>
+<p>Primary Purpose and Mechanism</p>
+<p>The core function of <code>VACUUM</code> is to physically remove files from cloud storage or disk. Delta Lake employs a soft delete mechanism for data that is no longer part of the current table state:</p>
+<ol>
+<li>Soft Deletion: Whenever records are deleted, updated, or merged in a Delta table, the older, irrelevant underlying records or files are tombstoned or marked for soft deletion. This is done to maintain time travel and ACID properties without immediate costly file rewriting or removal.</li>
+<li>Physical Deletion: These tombstoned files are not physically deleted from storage until the <code>VACUUM</code> command is explicitly run. Running <code>VACUUM</code> removes all such files that are no longer referenced in the transaction log and have exceeded the retention duration.</li>
+<li>Storage Savings: The key benefit of running <code>VACUUM</code> is that it helps save on storage cost by permanently removing unnecessary files.</li>
+</ol>
+<p>Key Considerations</p>
+<ol>
+<li>
+<p>Query Performance:
+A popular misconception is that running <code>VACUUM</code> makes queries run faster. This is not the case. Query performance is determined by file filtering and pruning handled by the Delta Log, which directs the engine to scan only the necessary active files. <code>VACUUM</code> only cleans up the retired physical files, and the data being scanned remains the same.</p>
+</li>
+<li>
+<p>Retention Duration and Safety Checks:
+<code>VACUUM</code> respects a retention duration setting to ensure that time travel capabilities are not compromised prematurely.</p>
+</li>
+</ol>
+<p>Default Duration: The default retention duration is 168 hours (7 days). Files created within this period are generally not deleted.
+   Overriding Retention: To remove files that have been marked for soft delete even if they fall within the default retention period (e.g., immediately after an <code>OPTIMIZE</code> operation), you must specify a shorter duration, such as <code>RETAIN 0 HOURS</code>.
+   Safety Warning: Delta Lake usually issues a warning when a user attempts to run <code>VACUUM</code> with a low retention duration (e.g., zero hours). To proceed with low retention, a configuration check must be disabled: <code>set spark.databicks.delta.retentiondurationcheck.enable = false</code>.</p>
+<ol>
+<li>Limitation on Time Travel:
+Running <code>VACUUM</code> limits your ability to time travel. If a file associated with a previous version is physically deleted by the <code>VACUUM</code> operation, attempting to access that specific old version (<code>VERSION AS OF</code> or <code>TIMESTAMP AS OF</code>) will fail because the required underlying file data is missing.</li>
+</ol>
+<p>Interaction with Other Operations</p>
+<p><code>OPTIMIZE</code> Compaction: When the <code>OPTIMIZE</code> command is run to compact small files into one large file, the original small files are tombstoned. These small files remain physically present until <code>VACUUM</code> is run to remove them and recover the storage space.
+   Shallow Clones: <code>VACUUM</code> operations on a source table are constrained by active references from shallow clones. If a file in the source table is deemed obsolete (orphaned) but is still being referenced by a shallow clone, running <code>VACUUM</code> on the source table will not delete that file. The file will only be deleted after all references, including those in all shallow clones, are removed (e.g., by running a delete operation on the relevant data in the shallow clone tables) and then <code>VACUUM</code> is re-run on the source.
+   Deep Clones: <code>VACUUM</code> runs independently on deep clone tables. Since a deep clone is a self-contained and independent copy of the source data with no references linking back, running <code>VACUUM</code> on the source table will not affect the deep clone, and vice versa.</p>
+<p>The <code>VACUUM</code> command is necessary housekeeping in Delta Lake, ensuring that while the transaction log maintains a consistent view of the data, the storage layer only retains necessary files, similar to how recycling services remove old, unnecessary containers to free up space.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="z-ordering"><strong>Z-ordering</strong><a class="headerlink" href="#z-ordering" title="Permanent link">#</a></h3>
+<p>The concept of Z-Ordering is one of the optimization techniques provided by Delta Lake, designed primarily to enhance query performance by maximizing data skipping and minimizing costly data transfers.</p>
+<p>The Problem Z-Ordering Solves (Costly Data Transfer)</p>
+<p>Before Z-ordering is applied, Delta Lake tables, like standard Parquet tables, store statistics (such as minimum and maximum values) for columns within the Delta Log.</p>
+<p>When a user submits a query with a filter (e.g., <code>WHERE age &gt;= 5 AND age &lt;= 10</code>), the query engine uses these statistics to determine which underlying data files need to be scanned and transferred into the memory of the compute cluster.</p>
+<p>If the required filter range overlaps with the minimum and maximum values recorded for a column in a specific Parquet file, that entire file must be transferred over the wire.
+   In poorly organized data, the statistics in different files often overlap significantly. This means that a filtered query may result in the necessary transfer and reading of all underlying data files, even if only a few records within those files actually match the criteria. Transferring all these files is a costly operation that consumes compute resources and leads to poor I/O performance.</p>
+<p>Mechanism of Z-Ordering</p>
+<p>Z-Ordering fundamentally optimizes the physical layout of data to minimize these file overlaps. It achieves this through a process often described as a sort and repartition.</p>
+<ol>
+<li>Collocating Similar Data</li>
+</ol>
+<p>The central idea is to collocate similar data points into the same physical data files. By grouping data together, the statistical ranges (min/max) of the resulting files become much tighter, meaning they are less likely to overlap.</p>
+<p>When a query is run after Z-ordering, the tight statistical ranges allow the engine to prune (filter out or skip) files that clearly do not contain the relevant data, avoiding their transfer over the network.</p>
+<ol>
+<li>Multi-Dimensional Mapping and Locality</li>
+</ol>
+<p>Z-Ordering is particularly powerful because it can apply this sorting principle across multiple columns simultaneously (multi-dimensional filtering).</p>
+<p>It works by taking the values from the selected columns and mapping this multi-dimensional space into a single dimension.
+   This mapping is done using a mathematical technique called a space-filling curve.
+   The curve ensures that data points which are close to each other in the original multi-dimensional space remain close to each other after being mapped to the single dimension (this concept is called preserving locality).</p>
+<p>This single, optimized dimension is then used to physically sort and arrange the data within the files, ensuring similar data points are grouped together.</p>
+<p>Using Z-Order with <code>OPTIMIZE</code></p>
+<p>The <code>ZORDER BY</code> command is not run in isolation; it must be executed together with the <code>OPTIMIZE</code> command.</p>
+<p>The two operations work hand in hand:</p>
+<ol>
+<li><code>OPTIMIZE</code> Compaction: The <code>OPTIMIZE</code> command’s role is to solve the small file problem by merging many small files into fewer, larger files (called "bins"), typically targeting a size of 1 GB.</li>
+<li>Z-Ordering Collocation: While <code>OPTIMIZE</code> is consolidating the small files, Z-Order simultaneously performs the necessary collocation (sorting and rearranging) of the data into the new, larger files.</li>
+</ol>
+<p>Running <code>OPTIMIZE ZORDER BY [columns]</code> leads to significant performance improvements, often seeing query runtimes decrease substantially because the number of files scanned is drastically reduced.</p>
+<p>Z-Ordering with Partitions</p>
+<p>Z-Ordering can be applied incrementally and selectively, particularly when dealing with Hive-style partitions (e.g., partitioning by date). If a table is partitioned (e.g., by <code>invoice date</code>), you can use a predicate or <code>WHERE</code> condition to apply Z-Ordering only to specific, recently updated partitions (e.g., <code>OPTIMIZE ... WHERE category = 'fruit'</code>). This means the expensive Z-Ordering operation is only performed on the small subset of new data, rather than the entire table.</p>
+<p>Z-Ordering is like organizing a massive library collection not just by author (which is like partitioning) but also simultaneously by subject, genre, and length, so that when a reader asks for "short sci-fi books from 2020," the librarian (the query engine) only needs to walk to one aisle and look at two shelves, instead of checking every aisle and every shelf just in case a relevant book overlapped into that section.</p>
+<p><strong>-------------------------------------------------------------------------------------------------------------</strong></p>
+<h3 id="liquid-clustering"><strong>Liquid Clustering</strong><a class="headerlink" href="#liquid-clustering" title="Permanent link">#</a></h3>
+<p>Liquid Clustering is an advanced optimization technique in Delta Lake designed to provide flexibility and robust query performance by dynamically managing the physical data layout.</p>
+<p>It solves the primary problem of inflexibility inherent in traditional Hive-style partitioning and Z-Ordering.</p>
+<p>Limitations of Traditional Methods Solved by Liquid Clustering</p>
+<p>Hive-style partitioning and Z-Ordering require the user to decide the columns upfront when defining the table.</p>
+<p>If your query filter pattern changes over time (e.g., switching from filtering by <code>country</code> to filtering by <code>category</code>), the original data layout becomes unhelpful.
+   To address the new filter pattern, you would typically need to rewrite the entire dataset according to the new schema or layout.</p>
+<p>Liquid Clustering solves this by allowing you to change the clustering columns anytime, making the approach very flexible. It is also incremental, meaning that when you change clustering columns later on, the data layout changes going ahead to reflect the new desired pattern.</p>
+<p>Mechanism and Core Principles</p>
+<p>The liquid clustering algorithm is designed to maintain a balanced layout in the data files. It ensures several key outcomes simultaneously:</p>
+<ol>
+<li>Uniform File Size: It ensures that files are of uniform or appropriate file size. It avoids creating large files that skew processing or very small files that harm performance.</li>
+<li>Appropriate Number of Files: It manages the data layout to ensure an appropriate number of files, thereby helping to avoid the small file problem.</li>
+<li>Data Collocation: Similar data is collocated (placed close together) within the same physical files, which maximizes data skipping during query execution.</li>
+</ol>
+<p>How Liquid Clustering Addresses Small Files and Data Skew</p>
+<p>Liquid Clustering directly addresses two significant performance inhibitors: the small file problem and data skew.</p>
+<ol>
+<li>Avoiding the Small File Problem</li>
+</ol>
+<p>By ensuring uniform and appropriate file sizes, LC avoids the small file problem. It achieves this by:</p>
+<p>Merging Small Files: It combines many small files into appropriately sized files.
+   Breaking Down Large Files: Conversely, it can also break down bigger files that are too large (which might otherwise cause data skew) into appropriately sized chunks.</p>
+<ol>
+<li>Avoiding Data Skew</li>
+</ol>
+<p>Data skew occurs when some partitions contain a disproportionately large amount of data compared to others, creating bottlenecks and leaving compute resources idle.</p>
+<p>In a real-world scenario where partitions (e.g., partitioned by year) might vary drastically in size, the tasks processing the largest partitions must complete before the job finishes (these are on the "critical path").
+   Liquid Clustering works by dividing the larger chunks into smaller buckets. This ensures that all processing tasks or cores receive a uniform amount of data to process, avoiding the skew problem and resulting in higher resource utilization and faster completion times.</p>
+<p>Relationship with Optimization Techniques</p>
+<p>Liquid clustering cannot be used together with Z-Ordering or Hive-style partitioning; it serves as the independent, primary mechanism for organizing the data layout.</p>
+<p>When choosing clustering columns, best practices suggest:
+   Select the columns most frequently used in your query filters.
+   If transitioning from a table that used both Hive partitioning and Z-Ordering, use both the partition column and the Z-Order column as the new clustering key.
+   If certain columns are highly correlated (meaning choosing one implies the value of the other), only include the primary one as the clustering key.</p>
+<p>Liquid clustering provides the flexibility to change clustering columns down the line, avoiding the need to fix partitioning or Z-Order upfront, which protects against changing query patterns.</p>
+<p>Liquid clustering functions like a smart warehouse management system that doesn't just sort inventory based on a single, fixed attribute (like traditional partitioning/Z-Ordering). Instead, it continuously and dynamically rearranges the goods into uniformly sized boxes, grouping similar items together, and automatically breaking down massive shipments into manageable loads, ensuring that no worker is overwhelmed by one oversized box and that retrieval remains efficient even if customer demand shifts to a different set of categories.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../sql/Mongo/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Mongo">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Mongo
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../devops/git/" class="md-footer__link md-footer__link--next" aria-label="Next: Git">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Git
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Manishkumar Chetpalli
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/manishkumarchetpalli/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/manish-chet" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.annotation", "content.code.copy", "content.tooltips", "content.tabs.link", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.top", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.instant.preview", "navigation.tracking", "navigation.path", "search.highlight", "search.suggest", "search.share", "navigation.footer", "content.action.feedback", "toc.follow", "toc.extend"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
